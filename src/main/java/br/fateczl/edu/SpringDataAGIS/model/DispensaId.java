@@ -1,8 +1,7 @@
 package br.fateczl.edu.SpringDataAGIS.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +13,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "aula")
-@IdClass(AulaId.class)
-public class Aula {
-	private MatriculaDisciplina matriculaDisciplina;
+public class DispensaId implements Serializable{
+	private static final long serialVersionVID = 1L;
+	private Aluno aluno;
+	private Disciplina disciplina;
 }
