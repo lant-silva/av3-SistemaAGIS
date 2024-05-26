@@ -18,7 +18,6 @@ import lombok.ToString;
 @Entity
 @Table(name = "curso")
 public class Curso {
-	
 	@Id
 	@Column(name = "codigo", nullable = false)
 	private int codigo;

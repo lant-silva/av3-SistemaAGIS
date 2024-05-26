@@ -1,6 +1,5 @@
 package br.fateczl.edu.SpringDataAGIS.model;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -9,6 +8,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedStoredProcedureQuery;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.StoredProcedureParameter;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -64,7 +66,7 @@ public class Aluno {
 	private int posicaoVestibular;
 	
 	@Column(name = "ano_ingresso", length = 4, nullable = false)
-	private String anoIntresso;
+	private String anoIngresso;
 	
 	@Column(name = "semestre_ingresso", length = 1, nullable = false)
 	private String semestreIngresso;
@@ -81,8 +83,7 @@ public class Aluno {
 	@Column(name = "turno", length = 10, nullable = false)
 	private String turno;
 	
-	@Id
-	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "curso_codigo", nullable = false)
-	private Curso curso;
+//	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "curso_codigo", nullable = false)
+//	private Curso curso;
 }
