@@ -23,6 +23,32 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "aluno")
+@NamedStoredProcedureQuery(
+		name = "Aluno.sp_geraranolimite",
+		procedureName = "sp_geraranolimite",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "ano", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "sem", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "anolimite", type = String.class)
+		}
+)
+@NamedStoredProcedureQuery(
+		name = "Aluno.sp_gerarra",
+		procedureName = "sp_gerarra",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "ano", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "sem", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "ra", type = String.class)
+		}
+)
+@NamedStoredProcedureQuery(
+		name = "Aluno.sp_geraringresso",
+		procedureName = "sp_geraringresso",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "ano", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "sem", type = String.class)
+		}
+)
 public class Aluno {
 
 	@Column(name = "cpf", length = 11, nullable = false)
@@ -83,7 +109,7 @@ public class Aluno {
 	@Column(name = "turno", length = 10, nullable = false)
 	private String turno;
 	
-//	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "curso_codigo", nullable = false)
-//	private Curso curso;
+	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "curso_codigo", nullable = false)
+	private Curso curso;
 }

@@ -1,7 +1,5 @@
 package br.fateczl.edu.SpringDataAGIS.controller;
 
-import java.sql.Date;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +15,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import br.fateczl.edu.SpringDataAGIS.model.Aluno;
 import br.fateczl.edu.SpringDataAGIS.model.Curso;
+import br.fateczl.edu.SpringDataAGIS.model.Matricula;
 import br.fateczl.edu.SpringDataAGIS.repository.IAlunoRepository;
 import br.fateczl.edu.SpringDataAGIS.repository.ICursoRepository;
+import br.fateczl.edu.SpringDataAGIS.repository.IMatriculaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -30,6 +30,9 @@ public class AlunoController {
 	
 	@Autowired
 	ICursoRepository cRep;
+	
+	@Autowired
+	IMatriculaRepository mRep;
 	
 	@RequestMapping(name = "aluno", value = "/aluno", method = RequestMethod.GET)
 	public ModelAndView alunoGet(@RequestParam Map<String, String> allRequestParam, HttpServletRequest request, ModelMap model) {
@@ -83,7 +86,7 @@ public class AlunoController {
 			cursos = listarCursos();
 			if(!cmd.contains("Listar")) {
 				cr = buscarCurso(curso);
-//				a.setCurso(cr);
+				a.setCurso(cr);
 				a.setCpf(cpf);
 			}
 			if(cmd.contains("Cadastrar") || cmd.contains("Alterar")) {
@@ -104,8 +107,12 @@ public class AlunoController {
 				a.setSemestreIngresso(semestreIngresso);
 				a.setSemestreGraduacao(semestreGraduacao);
 				cr = buscarCurso(curso);
-//				a.setCurso(cr);
+				a.setCurso(cr);
 				a.setTurno(turno);
+				
+				a.setAnoIngresso(aRep.sp_geraringresso(anoIngresso, semestreGraduacao));
+				a.setRa(aRep.sp_gerarra(anoIngresso, semestreGraduacao));
+				a.setAnoLimite(aRep.sp_geraranolimite(anoIngresso, semestreGraduacao));
 			}
 			if(cmd.contains("Cadastrar")) {
 				saida = cadastrarAluno(a);
@@ -121,7 +128,7 @@ public class AlunoController {
 			}
 			if(cmd.contains("Buscar")) {
 				a = buscarAluno(a);
-//				cr = a.getCurso();
+				cr = a.getCurso();
 			}
 			if(cmd.contains("Listar")) {
 				alunos = listarAlunos();
@@ -141,6 +148,15 @@ public class AlunoController {
 	}
 	
 	private String cadastrarAluno(Aluno a) {
+		Matricula m = new Matricula();
+		if(mRep.findAll() == null) {
+			m.setCodigo(100001);
+			m.setAluno(a);
+			m.setDataMatricula(LocalDate.now());
+			mRep.save(m);
+		}else {
+			
+		}
 		aRep.save(a);
 		return "Aluno inserido com sucesso";
 	}
@@ -172,4 +188,5 @@ public class AlunoController {
 	private List<Curso> listarCursos() {
 		return cRep.findAll();
 	}
+	
 }

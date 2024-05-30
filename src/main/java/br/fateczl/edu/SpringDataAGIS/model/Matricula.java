@@ -22,6 +22,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "matricula")
+
 public class Matricula {
 	
 	@Id
@@ -29,7 +30,7 @@ public class Matricula {
 	private int codigo;
 	
 	@JoinColumn(name = "aluno_ra", nullable = false)
-	@ManyToOne(targetEntity = Aluno.class, fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Aluno.class, fetch = FetchType.EAGER)
 	private Aluno aluno;
 	
 	@Column(name = "data_matricula", nullable = false)
