@@ -27,6 +27,7 @@ class SpringDataAgisApplicationTests {
 	
 	@Test
 	void contextLoads() {
+		gerarValores();
 		
         Aluno aluno1 = new Aluno(
                 "12345678901", "RA123456", "João Silva", "João",
@@ -83,5 +84,9 @@ class SpringDataAgisApplicationTests {
 		System.out.println(mTemp.toString());
 		assertThat(mTemp != null);
 		assertThat(mTemp.getCodigo() == 1002);
+	}
+	
+	private void gerarValores() {
+		
 	}
 }
