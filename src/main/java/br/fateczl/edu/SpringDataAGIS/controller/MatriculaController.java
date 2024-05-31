@@ -74,24 +74,36 @@ public class MatriculaController {
 					}
 				}
 				inserirMatricula(disciplinasSelecionadas, ra);
+				saida = "Matricula finalizada";
+			}
+			if(cmd.contains("Consultar Matricula")) {
+				a.setRa(ra);
+				matriculaDisciplinas = listarDisciplinas(ra);
+				listar = true;
 			}
 		} catch(Exception e) {
 			erro = e.getMessage();
 		} finally {
-			
+			model.addAttribute("saida", saida);
+			model.addAttribute("erro", erro);
+			model.addAttribute("disciplinas", matriculaDisciplinas);
+			model.addAttribute("aluno", a);
+			model.addAttribute("listar", listar);
 		}
-		
 		return new ModelAndView("matricula");
 	}
 	
-	private void inserirMatricula(String[] disciplinasSelecionadas, String ra) {
-		// TODO Auto-generated method stub
-		
+	private String inserirMatricula(String[] disciplinasSelecionadas, String ra) {
+		int codigo = mRep.sp_gerarmatricula(ra);
+		String saida = null;
+		for(String str : disciplinasSelecionadas) {
+			saida = mRep.sp_inserirMatricula(ra, codigo, Integer.parseInt(str));
+		}
+		return saida;
 	}
 
 	private List<MatriculaDisciplina> listarDisciplinas(String ra) {
-		
-		MatriculaDisciplina md = mdRep.fn_listarultimamatricula(ra);
+		return mdRep.fn_listarultimamatricula(ra);
 	}
 
 	private boolean validarDataMatricula(LocalDate dataMatricula) {
@@ -142,9 +154,5 @@ public class MatriculaController {
 		}else{
 			return false;
 		}
-	}
-	
-	public String gerarMatricula(String ra) {
-		
 	}
 }

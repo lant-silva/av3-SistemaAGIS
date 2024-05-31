@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import br.fateczl.edu.SpringDataAGIS.model.Matricula;
@@ -16,4 +17,10 @@ public interface IMatriculaRepository extends JpaRepository<Matricula, Integer>{
                    "AND a.curso_codigo = c.codigo " +
                    "AND m.aluno_ra = a.ra", nativeQuery = true)
     List<Object[]> findUltimaMatricula(@Param("codigoMatricula") Integer codigoMatricula);
+    
+    @Procedure(name = "Matricula.sp_gerarmatricula")
+    int sp_gerarmatricula(@Param("ra") String ra);
+    
+    @Procedure(name = "Matricula.sp_inserirmatricula")
+    String sp_inserirMatricula(@Param("ra") String ra, @Param("codigoMatricula") int codigoMatricula, @Param("codigoDisciplina") int codigoDisciplina);
 }

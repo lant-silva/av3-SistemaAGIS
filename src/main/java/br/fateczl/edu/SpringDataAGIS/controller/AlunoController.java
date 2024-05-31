@@ -148,15 +148,7 @@ public class AlunoController {
 	}
 	
 	private String cadastrarAluno(Aluno a) {
-		Matricula m = new Matricula();
-		if(mRep.findAll() == null) {
-			m.setCodigo(100001);
-			m.setAluno(a);
-			m.setDataMatricula(LocalDate.now());
-			mRep.save(m);
-		}else {
-			
-		}
+		mRep.sp_gerarmatricula(a.getRa());
 		aRep.save(a);
 		return "Aluno inserido com sucesso";
 	}
