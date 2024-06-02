@@ -303,12 +303,39 @@ BEGIN
 	RETURN
 END
 
+CREATE PROCEDURE sp_alunodispensa(@alunora CHAR(9), @codigodisciplina INT, @motivo VARCHAR(200), @saida VARCHAR(200) OUTPUT)
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM dispensa WHERE aluno_ra = @alunora AND disciplina_codigo = @codigodisciplina AND estado = 'Em andamento')
+	BEGIN
+		RAISERROR('Disciplina já possui dispensa pendente', 16, 1)
+		RETURN
+	END
+	ELSE
+	IF EXISTS(SELECT * FROM dispensa WHERE aluno_ra = @alunora AND disciplina_codigo = @codigodisciplina AND estado = 'Pedido de dispensa recusado')
+	BEGIN
+		RAISERROR('Pedido de dispensa já foi recusado', 16, 1)
+		RETURN
+	END
+	ELSE
+	BEGIN
+		INSERT INTO dispensa VALUES
+		(@alunora, @codigodisciplina, @motivo, 'Em andamento')
+		SET @saida = 'Dispensa solicitada'
+	END
+END
+
+exec sp_teste
+
+select * from curso
+select * from matricula
+
 CREATE PROCEDURE sp_teste
 AS
 BEGIN
 	INSERT INTO curso VALUES
-	(101, 'Análise e Desenvolvimento de Sistemas', 2800, 'ADS', 5),
-	(102, 'Desenvolvimento de Software Multiplataforma', 1400, 'DSM', 5)
+	(101, 2800, 'Análise e Desenvolvimento de Sistemas', 5, 'ADS'),
+	(102, 1400, 'Desenvolvimento de Software Multiplataforma', 5, 'DSM')
 
 	INSERT INTO professor VALUES
 	(1001, 'Marcelo Silva', 'Mestre'),

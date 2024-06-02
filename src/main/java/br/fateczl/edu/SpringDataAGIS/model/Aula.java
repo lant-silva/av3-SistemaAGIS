@@ -30,7 +30,7 @@ public class Aula {
 	@Id
 	@JoinColumn(name = "matricula_codigo", nullable = false)
 	@JoinColumn(name = "disciplina_codigo", nullable = false)
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = MatriculaDisciplina.class, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = MatriculaDisciplina.class, fetch = FetchType.EAGER)
 	private MatriculaDisciplina matriculaDisciplina;
 	
 	@Id

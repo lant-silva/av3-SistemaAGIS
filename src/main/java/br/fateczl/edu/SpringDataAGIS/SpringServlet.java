@@ -10,19 +10,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRegistration;
 
 @Component
-public class SpringServlet implements WebApplicationInitializer {
+public class SpringServlet implements WebApplicationInitializer{
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		AnnotationConfigWebApplicationContext context = 
-				new AnnotationConfigWebApplicationContext();
+		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
 		context.register(WebConfig.class);
 		ServletRegistration.Dynamic dispatcher = 
-				servletContext.addServlet
-				("dispatcher", new DispatcherServlet(context));
+				servletContext.addServlet("dispatcher", new DispatcherServlet(context));
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/");
-		
 	}
-
 }

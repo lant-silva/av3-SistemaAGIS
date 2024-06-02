@@ -14,7 +14,11 @@ import org.springframework.web.servlet.ModelAndView;
 import br.fateczl.edu.SpringDataAGIS.model.Aluno;
 import br.fateczl.edu.SpringDataAGIS.model.Disciplina;
 import br.fateczl.edu.SpringDataAGIS.model.Dispensa;
+import br.fateczl.edu.SpringDataAGIS.model.MatriculaDisciplina;
 import br.fateczl.edu.SpringDataAGIS.repository.IAlunoRepository;
+import br.fateczl.edu.SpringDataAGIS.repository.IDisciplinaRepository;
+import br.fateczl.edu.SpringDataAGIS.repository.IDispensaRepository;
+import br.fateczl.edu.SpringDataAGIS.repository.IMatriculaDisciplinaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -24,7 +28,13 @@ public class DispensaController {
 	private IAlunoRepository aRep;
 	
 	@Autowired
+	private IMatriculaDisciplinaRepository mdRep;
 	
+	@Autowired
+	private IDispensaRepository dispRep;
+	
+	@Autowired
+	private IDisciplinaRepository discRep;
 	
 	@RequestMapping(name="dispensa", value="/dispensa", method = RequestMethod.GET)
 	public ModelAndView dispensaGet(@RequestParam Map<String, String> allRequestParam, HttpServletRequest request, ModelMap model) {
@@ -77,6 +87,34 @@ public class DispensaController {
 	}
 	
 	
+	private String solicitarDispensa(Aluno a, Disciplina d, String motivo) {
+		return dispRep.sp_alunodispensa(a.getRa(), d.getCodigo(), motivo);
+	}
+
+	private Disciplina buscarDisciplina(Disciplina d) {
+		return discRep.findById(d.getCodigo()).get();
+	}
+
+	private List<Dispensa> listarDispensas(String ra) {
+		List<Dispensa> dis = dispRep.findAll();
+		List<Dispensa> aux = new ArrayList<>();
+		for(Dispensa d : dis) {
+			if(d.getAluno().getRa().contains(ra)) {
+				aux.add(d);
+			}
+		}
+		return aux;
+	}
+
+	private List<Disciplina> listarDisciplinas(String ra) {
+		List<MatriculaDisciplina> md = mdRep.fn_listarultimamatricula(ra);
+		List<Disciplina> d = new ArrayList<>();
+		for(MatriculaDisciplina m : md) {
+			d.add(m.getDisciplina());
+		}
+		return d;
+	}
+
 	private Aluno buscarAluno(String ra) throws Exception {
 		if(aRep.findById(ra).isEmpty()) {
 			throw new Exception("Aluno não encontrado");

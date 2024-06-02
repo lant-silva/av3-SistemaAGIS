@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedStoredProcedureQuery;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.StoredProcedureParameter;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,16 +26,26 @@ import lombok.ToString;
 @Entity
 @Table(name = "empregado")
 @IdClass(DispensaId.class)
+@NamedStoredProcedureQuery(
+		name = "Dispensa.sp_alunodispensa",
+		procedureName = "sp_alunodispensa",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "ra", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "disciplina", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "motivo", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
+		}
+)
 public class Dispensa {
 	
 	@Id
 	@JoinColumn(name = "aluno_ra", nullable = false)
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Aluno.class, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Aluno.class, fetch = FetchType.EAGER)
 	private Aluno aluno;
 	
 	@Id
 	@JoinColumn(name = "disciplina_codigo", nullable = false)
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Disciplina.class, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Disciplina.class, fetch = FetchType.EAGER)
 	private Disciplina disciplina;
 	
 	@Column(name = "motivo", length = 200, nullable = false)

@@ -12,20 +12,17 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @ComponentScan(basePackages = "br.edu.fateczl.SpringDataAGIS")
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer{
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.
-			addResourceHandler("/resources/**").
-			addResourceLocations("/WEB-INF/resources/");
+		registry.addResourceHandler("/resources/css/**").addResourceLocations("/WEB-INF/resources/css/");
+		registry.addResourceHandler("/resources**").addResourceLocations("/WEB-INF/resources/");
 	}
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.
-			addViewController("/").
-			setViewName("index");
+		registry.addViewController("/").setViewName("index");
 	}
 
 	@Bean
@@ -36,5 +33,4 @@ public class WebConfig implements WebMvcConfigurer {
 		resolver.setSuffix(".jsp");
 		return resolver;
 	}
-
 }

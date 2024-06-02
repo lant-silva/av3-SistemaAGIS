@@ -91,7 +91,7 @@ public class AlunoController {
 			}
 			if(cmd.contains("Cadastrar") || cmd.contains("Alterar")) {
 				a.setCpf(cpf);
-				a.setRa(ra);
+				a.setRa(gerarRa());
 				a.setNome(nome);
 				a.setNomeSocial(nomeSocial);
 				a.setDataNasc(LocalDate.parse(dataNasc));
@@ -103,16 +103,12 @@ public class AlunoController {
 				a.setInstituicaoSegundoGrau(instituicaoSegundoGrau);
 				a.setPontuacaoVestibular(Double.parseDouble(pontuacaoVestibular));
 				a.setPosicaoVestibular(Integer.parseInt(posicaoVestibular));
-				a.setAnoIngresso(anoIngresso);
-				a.setSemestreIngresso(semestreIngresso);
+				a.setAnoIngresso(gerarAnoIngresso());
+				a.setSemestreIngresso(gerarSemestreIngresso());
 				a.setSemestreGraduacao(semestreGraduacao);
 				cr = buscarCurso(curso);
 				a.setCurso(cr);
 				a.setTurno(turno);
-				
-				a.setAnoIngresso(aRep.sp_geraringresso(anoIngresso, semestreGraduacao));
-				a.setRa(aRep.sp_gerarra(anoIngresso, semestreGraduacao));
-				a.setAnoLimite(aRep.sp_geraranolimite(anoIngresso, semestreGraduacao));
 			}
 			if(cmd.contains("Cadastrar")) {
 				saida = cadastrarAluno(a);
@@ -147,14 +143,43 @@ public class AlunoController {
 		return new ModelAndView("aluno");
 	}
 	
+
+
+	private String gerarRa() {
+		boolean unico = false;
+		String ano = gerarAnoIngresso();
+		String sem = gerarSemestreIngresso();
+		String raux = "";
+		String ra = "";
+		while(!unico) {
+			int[] rnum = new int[4];
+			for(int i : rnum) {
+				rnum[i] = (int) Math.random()*10;
+				raux = raux + Integer.toString(rnum[i]);
+			}
+			ra = ano + sem + raux;			
+			//verificar se ra é unico no sistema
+			if(aRep.findById(ra).isEmpty()) {
+				unico = true;
+			}
+			raux = null;
+		}
+		return ra;
+	}
+
 	private String cadastrarAluno(Aluno a) {
-		mRep.sp_gerarmatricula(a.getRa());
 		aRep.save(a);
+		mRep.sp_gerarmatricula(a.getRa());
 		return "Aluno inserido com sucesso";
 	}
 	
-	private String atualizarAluno(Aluno a) {
-		aRep.save(a);
+	private String atualizarAluno(Aluno a) throws Exception{
+		
+		if(aRep.findById(a.getRa()).isEmpty()) {
+			throw new Exception("Aluno não encontrado");
+		}else{
+			aRep.save(a);
+		}
 		return "Aluno atualizado com sucesso";
 	}
 	
@@ -179,6 +204,19 @@ public class AlunoController {
 
 	private List<Curso> listarCursos() {
 		return cRep.findAll();
+	}
+	
+	private String gerarAnoIngresso() {
+		return Integer.toString(LocalDate.now().getYear());
+	}
+	
+	private String gerarSemestreIngresso() {
+		int sem = LocalDate.now().getMonthValue();
+		if(sem <= 6) {
+			return Integer.toString(1);
+		}else {
+			return Integer.toString(2);
+		}
 	}
 	
 }
