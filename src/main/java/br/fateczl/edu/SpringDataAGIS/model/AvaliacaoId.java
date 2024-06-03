@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AvaliacaoId implements Serializable{
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionVID = 1L;
 	private Disciplina disciplina;
-	private int codigo;
+	private Avaliacao avaliacao;
 }

@@ -68,6 +68,10 @@ public class SecretariaDispensaController {
     }
 
     
+	private String concluirDispensa(String ra, String disciplina, String aprovacao) {
+		
+	}
+
 	private List<Dispensa> listarDispensas() {
 		return dispRep.findAll();
 	}

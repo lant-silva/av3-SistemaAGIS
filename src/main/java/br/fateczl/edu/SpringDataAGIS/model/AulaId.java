@@ -15,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AulaId implements Serializable{
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionVID = 1L;
 	private MatriculaDisciplina matriculaDisciplina;
 	private LocalDate dataAula;
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import br.fateczl.edu.SpringDataAGIS.model.Aluno;
 import br.fateczl.edu.SpringDataAGIS.model.Curso;
-import br.fateczl.edu.SpringDataAGIS.model.Matricula;
 import br.fateczl.edu.SpringDataAGIS.repository.IAlunoRepository;
 import br.fateczl.edu.SpringDataAGIS.repository.ICursoRepository;
 import br.fateczl.edu.SpringDataAGIS.repository.IMatriculaRepository;
@@ -106,9 +106,11 @@ public class AlunoController {
 				a.setAnoIngresso(gerarAnoIngresso());
 				a.setSemestreIngresso(gerarSemestreIngresso());
 				a.setSemestreGraduacao(semestreGraduacao);
+				a.setAnoLimite(gerarAnoLimite());
 				cr = buscarCurso(curso);
 				a.setCurso(cr);
-				a.setTurno(turno);
+				a.setTurno("T");
+				a.setDataPrimeiraMatricula(LocalDate.now());
 			}
 			if(cmd.contains("Cadastrar")) {
 				saida = cadastrarAluno(a);
@@ -145,8 +147,16 @@ public class AlunoController {
 	
 
 
+	private String gerarAnoLimite() {
+		int ano = Integer.parseInt(gerarAnoIngresso());
+		String sem = gerarSemestreIngresso();
+		ano += 5;
+		return ano + "/" + sem;
+	}
+
 	private String gerarRa() {
 		boolean unico = false;
+		Random random = new Random();
 		String ano = gerarAnoIngresso();
 		String sem = gerarSemestreIngresso();
 		String raux = "";
@@ -154,8 +164,8 @@ public class AlunoController {
 		while(!unico) {
 			int[] rnum = new int[4];
 			for(int i : rnum) {
-				rnum[i] = (int) Math.random()*10;
-				raux = raux + Integer.toString(rnum[i]);
+				rnum[i] = random.nextInt(9) + 1; 
+				raux = raux.concat(Integer.toString(rnum[i]));
 			}
 			ra = ano + sem + raux;			
 			//verificar se ra é unico no sistema

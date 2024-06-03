@@ -13,6 +13,7 @@
 		<ul>
 			<li class="menu-item"><a href="indexprofessor">Home</a>
 			<li class="menu-item"><a href="aula">Gerenciar Aulas</a>
+			<li class="menu-item"><a href="avaliacao">Gerenciar Avaliações</a>
 			<li class="menu-item"><a href="index">Sair</a>
 		</ul>
 	</nav>

@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,15 +21,14 @@ import lombok.Setter;
 @Entity
 @Table(name = "avaliacao")
 public class Avaliacao {
-	
 	@Id
+	@Column(name = "codigo", nullable = false)
+	private int codigo;
+
 	@JoinColumn(name = "disciplina_codigo", nullable = false)
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Disciplina.class, fetch = FetchType.EAGER)
 	private Disciplina disciplina;
 	
-	@Id
-	@Column(name = "codigo", nullable = false)
-	private int codigo;
 	
 	@Column(name = "nome", length = 20, nullable = false)
 	private String nome;

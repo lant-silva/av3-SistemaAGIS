@@ -121,15 +121,22 @@ BEGIN
 	END
 END
 
+select * from aluno
+
+declare @codigomatricula INT
+exec sp_gerarmatricula 202410000, @codigomatricula OUTPUT
+print @codigomatricula
+
+delete aluno
+
+select * from matricula
+select * from matricula_disciplina
+
 CREATE PROCEDURE sp_gerarmatricula(@ra CHAR(9), @codigomatricula INT OUTPUT)
 AS
 BEGIN
 	DECLARE @cont INT
 	DECLARE @novocodigo INT = 0
-	DECLARE @ano CHAR(4)
-	DECLARE @sem CHAR(1)
-
-	EXEC sp_geraringresso @ano OUTPUT, @sem OUTPUT
 
 	SELECT @cont = COUNT(*)
 	FROM matricula
@@ -147,13 +154,13 @@ BEGIN
 		ORDER BY codigo DESC
 
 		INSERT INTO matricula VALUES
-		(@novocodigo, @ra, GETDATE()) -- o ultimo valor é só um placeholder
+		(@codigomatricula, GETDATE(), @ra) -- o ultimo valor é só um placeholder
 
 
 		-- Como a lógica para atualização da matricula será realizada por outra procedure,
 		-- eu apenas reinsiro a ultima matricula feita pelo aluno
-		INSERT INTO matricula_disciplina
-		SELECT @novocodigo, disciplina_codigo, situacao, qtd_faltas, nota_final FROM dbo.fn_ultimamatricula(@codigomatricula)
+		INSERT INTO matricula_disciplina (matricula_codigo, disciplina_codigo, situacao, nota_final, qtd_faltas)
+		SELECT @novocodigo, disciplina_codigo, situacao, nota_final, qtd_faltas FROM dbo.fn_ultimamatricula(@codigomatricula)
 
 		-- Retorno o novo codigo
 		SET @codigomatricula = @novocodigo
@@ -172,9 +179,9 @@ BEGIN
 		END
 
 		INSERT INTO matricula VALUES
-		(@codigomatricula, @ra, GETDATE())
+		(@codigomatricula, GETDATE(), @ra)
 
-		INSERT INTO matricula_disciplina (matricula_codigo, disciplina_codigo, situacao, qtd_faltas, nota_final)
+		INSERT INTO matricula_disciplina (matricula_codigo, disciplina_codigo, situacao, nota_final, qtd_faltas)
 		SELECT * FROM dbo.fn_matriculainicial(@codigomatricula)
 	END
 END
@@ -220,6 +227,27 @@ BEGIN
 	RETURN
 END
 
+CREATE FUNCTION fn_ultimamatricula(@codigomatricula INT)
+RETURNS @tabela TABLE(
+matricula_codigo INT,
+disciplina_codigo INT,
+situacao VARCHAR(50),
+qtd_faltas INT,
+nota_final FLOAT
+)
+AS
+BEGIN
+	INSERT INTO @tabela (matricula_codigo, disciplina_codigo, situacao, qtd_faltas, nota_final)
+	SELECT @codigomatricula AS matricula_codigo, md.disciplina_codigo, md.situacao, md.qtd_faltas, md.nota_final
+	FROM matricula_disciplina md, matricula m, aluno a, curso c
+	WHERE md.matricula_codigo = @codigomatricula	
+		AND m.codigo = @codigomatricula
+		AND a.curso_codigo = c.codigo
+		AND m.aluno_ra = a.ra
+	RETURN
+END
+
+
 CREATE PROCEDURE sp_verificarconflitohorario(@codigomatricula INT, @qtdaulas INT, @diasemana VARCHAR(50), @horarioinicio TIME, @horariofim TIME, @conflito BIT OUTPUT)
 AS
 DECLARE @conflitoexiste INT
@@ -244,6 +272,8 @@ ELSE
 BEGIN
 	SET @conflito = 0
 END
+
+select * from matricula_disciplina
 
 CREATE FUNCTION fn_listarultimamatricula(@ra char(9))
 RETURNS @tabela TABLE(
@@ -323,6 +353,26 @@ BEGIN
 		(@alunora, @codigodisciplina, @motivo, 'Em andamento')
 		SET @saida = 'Dispensa solicitada'
 	END
+END
+
+CREATE FUNCTION fn_matriculainicial(@codigomatricula INT)
+RETURNS @tabela TABLE(
+matricula_codigo INT,
+disciplina_codigo INT,
+situacao VARCHAR(50),
+qtd_faltas INT,
+nota_final FLOAT
+)
+AS
+BEGIN
+	INSERT INTO @tabela (matricula_codigo, disciplina_codigo, situacao, qtd_faltas, nota_final)
+	SELECT @codigomatricula, d.codigo, 'Não cursado' AS situacao, 0 AS qtd_faltas, 0.0 AS nota_final
+	FROM matricula m, curso c, disciplina d, aluno a
+	WHERE d.curso_codigo = c.codigo
+		AND a.curso_codigo = c.codigo
+		AND m.codigo = @codigomatricula
+		AND m.aluno_ra = a.ra
+	RETURN
 END
 
 exec sp_teste

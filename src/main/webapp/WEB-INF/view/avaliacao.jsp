@@ -3,6 +3,11 @@
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
+<script>
+function editarCliente(codigo) {
+	window.location.href = 'cliente?cmd=alterar&codigo=' + codigo;
+}
+</script>
 <head>
 <meta charset="ISO-8859-1">
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
@@ -35,6 +40,7 @@
 								</c:forEach>
 						</select>
 					<td />
+					<td><input type="submit" id="botao" name="botao" value="Listar Av. por Disciplina"><td />
 				</tr>
 				<tr>
 					<td colspan="3"><input class="input_data" type="number"
@@ -50,7 +56,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3"><input class="input_data" type="number"
+					<td colspan="3"><input class="input_data" type="text"
 						id="peso" name="peso" placeholder="Peso"
 						value='<c:out value="${avaliacao.peso}"></c:out>'>
 					<td />
@@ -82,17 +88,24 @@
 	</div>
 	<div align="center">
 		<c:if test="${not empty avaliacoes }">
+		<div class="container">
 			<table class="table-round">
 				<thead>
 					<tr>
-						<td>Disciplina</td>
-						<td>Nome</td>
-						<td>Peso</td>
+						<td>Selecionar</td>
+						<td align="center">Disciplina</td>
+						<td align="center">Nome</td>
+						<td align="center">Peso</td>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="a" items=${avaliacoes }>
+					<c:forEach var="a" items="${avaliacoes }">
 						<tr>
+							<td>
+								<form action="avaliacao" method="post">
+									<input type="submit" id="botao" name="botao"value="${c.codigo}" onclick="editarAvaliacao(this.value)">
+								</form>
+							</td>
 							<td><c:out value="${a.disciplina.nome }"/></td>
 							<td><c:out value="${a.nome }"/></td>
 							<td><c:out value="${a.peso }"/></td>
@@ -100,6 +113,7 @@
 					</c:forEach>
 				</tbody>
 			</table>
+			</div>
 		</c:if>
 	</div>
 </body>

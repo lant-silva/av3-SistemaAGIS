@@ -109,7 +109,7 @@ public class Aluno {
 	@Column(name = "turno", length = 10, nullable = false)
 	private String turno;
 	
-	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "curso_codigo", nullable = false)
 	private Curso curso;
 }
