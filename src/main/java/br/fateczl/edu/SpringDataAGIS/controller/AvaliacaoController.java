@@ -85,10 +85,10 @@ public class AvaliacaoController {
 			if(cmd.contains("Buscar")) {
 				a = buscarAvaliacao(a);
 			}
-			if(cmd.contains("Listar")) {
+			if(cmd.equals("Listar")) {
 				avaliacoes = listarAvaliacoes();
 			}
-			if(cmd.contains("Listar Av. por Disciplina")) {
+			if(cmd.equals("Listar Av. por Disciplina")) {
 				d.setCodigo(Integer.parseInt(disciplina));
 				avaliacoes = listarAvaliacoesDisciplina(d);
 			}
@@ -132,11 +132,15 @@ public class AvaliacaoController {
 		return aRep.findById(a.getCodigo()).get();
 	}
 
-	private List<Avaliacao> listarAvaliacoes() {
-		return aRep.findAll();
+	private List<Avaliacao> listarAvaliacoes() throws Exception {
+		if(aRep.findAll().isEmpty()) {
+			throw new Exception("Não há avaliações cadastradas");
+		}else {			
+			return aRep.findAll();
+		}
 	}
 
-	private List<Avaliacao> listarAvaliacoesDisciplina(Disciplina d) {
+	private List<Avaliacao> listarAvaliacoesDisciplina(Disciplina d) throws Exception {
 		List<Avaliacao> av = aRep.findAll();
 		List<Avaliacao> aux = new ArrayList<>();
 		for(Avaliacao a : av) {
@@ -144,7 +148,11 @@ public class AvaliacaoController {
 				aux.add(a);
 			}
 		}
-		return aux;
+		if(aux.isEmpty()) {
+			throw new Exception("A disciplina selecionada não possui avaliações cadastradas");
+		}else {
+			return aux;			
+		}
 	}
 	
 	private boolean validarPesos(Avaliacao a) {

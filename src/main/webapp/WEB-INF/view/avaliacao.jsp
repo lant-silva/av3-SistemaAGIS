@@ -50,7 +50,7 @@ function editarCliente(codigo) {
 					<td><input type="submit" id="botao" name="botao" value="Buscar"><td />
 				<tr />
 				<tr>
-					<td colspan="4"><input class="input_data" type="text"
+					<td colspan="3"><input class="input_data" type="text"
 						maxlength="100" id="nome" name="nome" placeholder="Nome"
 						value='<c:out value="${avaliacao.nome}"></c:out>'>
 					</td>
@@ -103,7 +103,10 @@ function editarCliente(codigo) {
 						<tr>
 							<td>
 								<form action="avaliacao" method="post">
-									<input type="submit" id="botao" name="botao"value="${c.codigo}" onclick="editarAvaliacao(this.value)">
+									<input type="hidden" name="disciplina" value="${a.disciplina.codigo}">
+									<input type="hidden" name="codigo" value="${a.codigo}">
+									<input type="hidden" name="botao" value="Buscar">
+									<input type="submit" value=""></input>
 								</form>
 							</td>
 							<td><c:out value="${a.disciplina.nome }"/></td>

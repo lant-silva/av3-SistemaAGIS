@@ -13,26 +13,29 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Entity
-@Table(name = "avaliacao")
-public class Avaliacao {
+@Table(name="nota_avaliacao")
+@IdClass(NotaAvaliacaoId.class)
+public class NotaAvaliacao {
+	
 	@Id
-	@Column(name = "avaliacao_codigo", nullable = false)
-	private int codigo;
-
+	@JoinColumn(name = "matricula_codigo", nullable = false)
 	@JoinColumn(name = "disciplina_codigo", nullable = false)
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Disciplina.class, fetch = FetchType.EAGER)
-	private Disciplina disciplina;
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = MatriculaDisciplina.class, fetch = FetchType.EAGER)
+	private MatriculaDisciplina matricula;
 	
+	@Id
+	@JoinColumn(name = "avaliacao_codigo", nullable = false)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Avaliacao.class, fetch = FetchType.EAGER)
+	private Avaliacao avaliacao;
 	
-	@Column(name = "nome", length = 20, nullable = false)
-	private String nome;
-	
-	@Column(name = "peso", nullable = false)
-	private float peso;
+	@Column(name = "nota", nullable = false)
+	private float nota;
 }
