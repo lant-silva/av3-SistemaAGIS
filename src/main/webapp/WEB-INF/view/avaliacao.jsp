@@ -11,9 +11,10 @@ function editarCliente(codigo) {
 <head>
 <meta charset="ISO-8859-1">
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
-<title>AGIS - Avaliação</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<title>AGIS - AvaliaÃ§Ã£o</title>
 <header>
-	<h1 align="center">Gerenciamento de Avaliações</h1>
+	<h1 align="center">Gerenciamento de AvaliaÃ§Ãµes</h1>
 	<div>
 		<jsp:include page="menuprofessor.jsp" />
 	</div>
@@ -72,52 +73,54 @@ function editarCliente(codigo) {
 	</div>
 	<br />
 	<div align="center">
-		<c:if test="${not empty saida }">
-			<H2>
-				<b><c:out value="${saida }" /></b>
-			</H2>
-		</c:if>
-	</div>
-	<br />
-	<div align="center">
-		<c:if test="${not empty erro }">
-			<H2>
-				<b><c:out value="${erro }" /></b>
-			</H2>
-		</c:if>
-	</div>
-	<div align="center">
-		<c:if test="${not empty avaliacoes }">
-		<div class="container">
-			<table class="table-round">
-				<thead>
-					<tr>
-						<td>Selecionar</td>
-						<td align="center">Disciplina</td>
-						<td align="center">Nome</td>
-						<td align="center">Peso</td>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="a" items="${avaliacoes }">
-						<tr>
-							<td>
-								<form action="avaliacao" method="post">
-									<input type="hidden" name="disciplina" value="${a.disciplina.codigo}">
-									<input type="hidden" name="codigo" value="${a.codigo}">
-									<input type="hidden" name="botao" value="Buscar">
-									<input type="submit" value=""></input>
-								</form>
-							</td>
-							<td><c:out value="${a.disciplina.nome }"/></td>
-							<td><c:out value="${a.nome }"/></td>
-							<td><c:out value="${a.peso }"/></td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-			</div>
-		</c:if>
-	</div>
+    <c:if test="${not empty saida }">
+        <h2><b><c:out value="${saida }" /></b></h2>
+    </c:if>
+</div>
+<br />
+<div align="center">
+    <c:if test="${not empty erro }">
+        <h2><b><c:out value="${erro }" /></b></h2>
+    </c:if>
+</div>
+<div align="center">
+    <c:if test="${not empty avaliacoes }">
+        <div class="container">
+            <table class="table-round">
+                <thead>
+                    <tr>
+                        <td>Selecionar</td>
+                        <td align="center">Disciplina</td>
+                        <td align="center">Nome</td>
+                        <td align="center">Peso</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="a" items="${avaliacoes }">
+                        <tr>
+                            <td>
+                                <form action="avaliacao" method="post">
+                                    <input type="hidden" name="disciplina" value="${a.disciplina.codigo}">
+                                    <input type="hidden" name="codigo" value="${a.codigo}">
+                                    <input type="hidden" name="botao" value="Buscar">
+                                    <center>
+    									<button type="submit" class="custom-button">
+      								 	   <i class="fas fa-pencil-alt" style="font-size: 24px;"></i>
+    									</button>
+									</center>
+                                </form>
+                                
+                            </td>
+                            <td><c:out value="${a.disciplina.nome }"/></td>
+                            <td><c:out value="${a.nome }"/></td>
+                            <td><c:out value="${a.peso }"/></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
+    </c:if>
+</div>
+
 </body>
 </html>
