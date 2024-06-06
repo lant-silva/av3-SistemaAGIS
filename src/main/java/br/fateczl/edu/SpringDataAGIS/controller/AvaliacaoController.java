@@ -61,11 +61,11 @@ public class AvaliacaoController {
 			disciplinas = dRep.findAll();
 			if(!cmd.contains("Listar")) {
 				d.setCodigo(Integer.parseInt(disciplina));
-				a.setCodigo(Integer.parseInt(codigoAvaliacao));
+				a.setAvaliacao_codigo(Integer.parseInt(codigoAvaliacao));
 			}
 			if(cmd.contains("Cadastrar") || cmd.contains("Alterar")) {
 				d = dRep.findById(d.getCodigo()).get();
-				a.setCodigo(Integer.parseInt(codigoAvaliacao));
+				a.setAvaliacao_codigo(Integer.parseInt(codigoAvaliacao));
 				a.setDisciplina(d);
 				a.setNome(nome);
 				a.setPeso(Float.parseFloat(peso));
@@ -102,6 +102,7 @@ public class AvaliacaoController {
 			model.addAttribute("disciplinas", disciplinas);
 			model.addAttribute("avaliacoes", avaliacoes);
 		}
+		
 		return new ModelAndView("avaliacao");
 	}
 
@@ -129,7 +130,7 @@ public class AvaliacaoController {
 	}
 
 	private Avaliacao buscarAvaliacao(Avaliacao a) {
-		return aRep.findById(a.getCodigo()).get();
+		return aRep.findById(a.getAvaliacao_codigo()).get();
 	}
 
 	private List<Avaliacao> listarAvaliacoes() throws Exception {
@@ -151,10 +152,10 @@ public class AvaliacaoController {
 		if(aux.isEmpty()) {
 			throw new Exception("A disciplina selecionada não possui avaliações cadastradas");
 		}else {
-			return aux;			
+			return aux;
 		}
 	}
-	
+
 	private boolean validarPesos(Avaliacao a) {
 		Disciplina d = a.getDisciplina();
 		List<Avaliacao> avaliacoes = aRep.findAll();

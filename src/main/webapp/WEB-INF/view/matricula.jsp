@@ -79,7 +79,7 @@
 								<td><c:out value="${d.disciplina.qtdAulas}" /></td>
 								<td><c:out value="${d.disciplina.horarioInicio}" /></td>
 								<td><c:out value="${d.disciplina.horarioFim}" /></td>
-								<td><c:out value="${d.disciplina.diaSemana}" /></td>
+								<td><c:out value="${d.disciplina.dia}" /></td>
 								<td><c:out value="${d.situacao}" /></td>
 							</tr>
 						</c:forEach>
@@ -111,7 +111,7 @@
 									<td><c:out value="${d.disciplina.qtdAulas}" /></td>
 									<td><c:out value="${d.disciplina.horarioInicio}" /></td>
 									<td><c:out value="${d.disciplina.horarioFim}" /></td>
-									<td><c:out value="${d.disciplina.diaSemana}" /></td>
+									<td><c:out value="${d.disciplina.dia}" /></td>
 									<td><c:out value="${d.situacao}" /></td>
 								</c:if>
 							</tr>

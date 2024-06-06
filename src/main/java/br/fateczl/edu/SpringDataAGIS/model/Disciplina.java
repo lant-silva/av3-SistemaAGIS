@@ -44,10 +44,10 @@ public class Disciplina {
 	private String dia;
 	
 	@JoinColumn(name = "curso_codigo", nullable = false)
-	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.EAGER)
 	private Curso curso;
 	
 	@JoinColumn(name = "professor_codigo", nullable = false)
-	@ManyToOne(targetEntity = Professor.class, fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Professor.class, fetch = FetchType.EAGER)
 	private Professor professor;
 }

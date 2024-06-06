@@ -124,13 +124,15 @@ END
 select * from aluno
 
 declare @codigomatricula INT
-exec sp_gerarmatricula 202410000, @codigomatricula OUTPUT
+exec sp_gerarmatricula 202413924, @codigomatricula OUTPUT
 print @codigomatricula
 
 delete aluno
 
 select * from matricula
 select * from matricula_disciplina
+
+delete matricula where codigo = 1000002
 
 CREATE PROCEDURE sp_gerarmatricula(@ra CHAR(9), @codigomatricula INT OUTPUT)
 AS
@@ -154,7 +156,7 @@ BEGIN
 		ORDER BY codigo DESC
 
 		INSERT INTO matricula VALUES
-		(@codigomatricula, GETDATE(), @ra) -- o ultimo valor é só um placeholder
+		(@novocodigo, GETDATE(), @ra) -- o ultimo valor é só um placeholder
 
 
 		-- Como a lógica para atualização da matricula será realizada por outra procedure,
@@ -262,7 +264,6 @@ WHERE md.matricula_codigo = @codigomatricula
 	OR (@horariofim BETWEEN d.horario_inicio AND d.horario_fim) 
 	OR (d.horario_inicio BETWEEN @horarioinicio AND @horariofim) 
 	OR (d.horario_fim BETWEEN @horarioinicio AND @horariofim))
-
 																	
 IF (@conflitoexiste >= 1)
 BEGIN
@@ -273,12 +274,133 @@ BEGIN
 	SET @conflito = 0
 END
 
-select * from matricula_disciplina
+delete matricula_disciplina
+delete matricula
+delete aluno
+select * from matricula
+select * from matricula_disciplina where matricula_codigo = 1000004 and disciplina_codigo = 1001
+select * from dbo.fn_listarultimamatricula(202410000)
+select * from avaliacao where avaliacao_codigo = 100101
+select * from nota_avaliacao
+select * from disciplina where codigo = 1001
+select * from avaliacao
+select * from dbo.fn_notasparciais(202415162)
+
+delete nota_avaliacao where nota = 10
+drop table nota_avaliacao
+
+insert into nota_avaliacao (nota, avaliacao_codigo, matricula_codigo, disciplina_codigo)values
+(10, 3, 1000002, 1002)
+
+CREATE FUNCTION fn_notasparciais(@ra CHAR(9))
+RETURNS @tabela TABLE(
+disciplina_codigo INT,
+avaliacao_codigo INT,
+matricula_codigo INT,
+disciplina_nome VARCHAR(100),
+nome_avaliacao VARCHAR(10),
+nota CHAR(3),
+nota_final CHAR(3),
+situacao VARCHAR(50)
+)
+AS
+BEGIN
+	DECLARE @disciplinacodigo INT,
+			@matriculacodigo INT,
+			@avaliacaocodigo INT,
+			@disciplinanome VARCHAR(100),
+			@nomeavaliacao VARCHAR(10),
+			@nota CHAR(3),
+			@notafinal CHAR(3),
+			@situacao VARCHAR(50)
+
+	DECLARE cur CURSOR FOR
+		SELECT d.codigo, av.avaliacao_codigo, m.codigo AS matricula_codigo, d.nome, av.nome, na.nota, md.nota_final
+		FROM disciplina d, avaliacao av, nota_avaliacao na, aluno a, matricula m, matricula_disciplina md
+		WHERE a.ra = 202415162
+			AND a.ra = m.aluno_ra
+			AND m.codigo = md.matricula_codigo
+			AND d.codigo = md.disciplina_codigo
+			AND av.disciplina_codigo = d.codigo
+			AND av.avaliacao_codigo = na.avaliacao_codigo
+			AND na.disciplina_codigo = d.codigo
+			AND na.matricula_codigo = md.matricula_codigo
+
+	OPEN cur
+	FETCH NEXT FROM cur INTO
+		@disciplinacodigo, @avaliacaocodigo, @matriculacodigo, @disciplinanome, @nomeavaliacao, @nota, @notafinal
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		
+		IF(CAST(@nota AS INT) >= 6)
+		BEGIN
+			SET @situacao = 'Aprovado'
+		END
+		ELSE
+		IF(CAST(@nota AS INT) < 6 AND CAST(@nota AS INT) >= 4)
+		BEGIN
+			SET @situacao = 'Exame'
+		END
+		ELSE
+		BEGIN
+			SET @situacao = 'Reprovado'
+		END
+
+		INSERT INTO @tabela (disciplina_codigo, disciplina_nome, nome_avaliacao, nota, nota_final, situacao) VALUES
+		(@disciplinacodigo, @disciplinanome, @nomeavaliacao, @nota, @notafinal, @situacao)
+
+		FETCH NEXT FROM cur INTO
+		@disciplinacodigo, @avaliacaocodigo, @matriculacodigo, @disciplinanome, @nomeavaliacao, @nota, @notafinal
+	END
+	CLOSE cur
+	DEALLOCATE cur
+	RETURN
+END
+
+CREATE FUNCTION fn_situacaodisciplina(@codigodisciplina INT)
+RETURNS @tabela TABLE(
+disciplina_codigo INT,
+aluno_ra CHAR(9),
+aluno_nome VARCHAR(100),
+disciplina_nome VARCHAR(100),
+nota_final CHAR(3),
+qtd_faltas_semanas INT,
+qtd_faltas_total INT
+)
+AS
+BEGIN
+	DECLARE @disciplinacodigo INT,
+			@alunora CHAR(9),
+			@alunonome VARCHAR(100),
+			@disciplinanome VARCHAR(100),
+			@notafinal CHAR(3),
+			@qtdfaltassemanas INT,
+			@qtdfaltastotal INT,
+			@qtdaulas INT
+
+	DECLARE cur CURSOR FOR
+		SELECT d.codigo, a.ra, d.nome, a.nome, md.nota_final, md.qtd_faltas
+		FROM disciplina d, matricula_disciplina md, matricula m, aluno a
+		WHERE d.codigo = md.disciplina_codigo
+		AND m.codigo = md.matricula_codigo
+		AND a.ra = m.aluno_ra
+	OPEN cur
+	FETCH NEXT FROM cur INTO
+		@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @notafinal, @qtdfaltastotal
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		IF(@codigodisciplina = @disciplinacodigo)
+		BEGIN
+			
+
+		END
+	END
+END
 
 CREATE FUNCTION fn_listarultimamatricula(@ra char(9))
 RETURNS @tabela TABLE(
 matricula_codigo INT,
-codigo INT,
+disciplina_codigo INT,
 nome VARCHAR(100),
 codigo_professor INT,
 nome_professor VARCHAR(100),
@@ -290,7 +412,7 @@ curso_codigo INT,
 data_matricula CHAR(6),
 situacao VARCHAR(50),
 qtd_faltas INT,
-nota_final CHAR(2)
+nota_final CHAR(3)
 )
 AS
 BEGIN
@@ -315,7 +437,7 @@ BEGIN
 	FROM matricula WHERE aluno_ra = @ra
 	ORDER BY codigo DESC
 
-	INSERT INTO @tabela (matricula_codigo, codigo, nome, codigo_professor, nome_professor, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, data_matricula, situacao, qtd_faltas, nota_final)	
+	INSERT INTO @tabela (matricula_codigo, disciplina_codigo, nome, codigo_professor, nome_professor, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, data_matricula, situacao, qtd_faltas, nota_final)	
 	SELECT CAST(md.matricula_codigo AS VARCHAR), CAST(d.codigo AS VARCHAR),
 		   d.nome, CAST(p.codigo AS VARCHAR), p.nome, CAST(d.qtd_aulas AS VARCHAR),
 		   d.horario_inicio, d.horario_fim, d.dia AS dia, 
@@ -355,18 +477,20 @@ BEGIN
 	END
 END
 
+select * from matricula_disciplina
+
 CREATE FUNCTION fn_matriculainicial(@codigomatricula INT)
 RETURNS @tabela TABLE(
 matricula_codigo INT,
 disciplina_codigo INT,
 situacao VARCHAR(50),
 qtd_faltas INT,
-nota_final FLOAT
+nota_final CHAR(3)
 )
 AS
 BEGIN
 	INSERT INTO @tabela (matricula_codigo, disciplina_codigo, situacao, qtd_faltas, nota_final)
-	SELECT @codigomatricula, d.codigo, 'Não cursado' AS situacao, 0 AS qtd_faltas, 0.0 AS nota_final
+	SELECT @codigomatricula, d.codigo, 'Não cursado' AS situacao, 0 AS qtd_faltas, 0 AS nota_final
 	FROM matricula m, curso c, disciplina d, aluno a
 	WHERE d.curso_codigo = c.codigo
 		AND a.curso_codigo = c.codigo
@@ -375,19 +499,25 @@ BEGIN
 	RETURN
 END
 
+
+declare @codigomatricula int = 1000001
+select * from dbo.fn_matriculainicial(@codigomatricula)
+
 exec sp_teste
 
+select * from aluno
+
 select * from curso
-select * from matricula
+select * from matricula_disciplina
 
 CREATE PROCEDURE sp_teste
 AS
 BEGIN
-	INSERT INTO curso VALUES
+	INSERT INTO curso (codigo, carga_horaria, nome, nota_enade, sigla) VALUES
 	(101, 2800, 'Análise e Desenvolvimento de Sistemas', 5, 'ADS'),
 	(102, 1400, 'Desenvolvimento de Software Multiplataforma', 5, 'DSM')
 
-	INSERT INTO professor VALUES
+	INSERT INTO professor (codigo, nome, titulacao) VALUES
 	(1001, 'Marcelo Silva', 'Mestre'),
 	(1002, 'Rafael Medeiros', 'Mestre'),
 	(1003, 'Adriana Bastos', 'Doutora'),
@@ -401,7 +531,7 @@ BEGIN
 	(1011, 'Gabriela Gonçalves', 'Doutora'),
 	(1012, 'Yasmin Ribeiro', 'Mestre')
 
-	INSERT INTO disciplina VALUES
+	INSERT INTO disciplina (codigo, nome, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, professor_codigo)VALUES 
 	(1001, 'Laboratório de Banco de Dados', 4, '14:50', '18:20', 'Segunda', 101, 1001),
 	(1002, 'Banco de Dados', 4, '14:50', '18:20', 'Terça', 101, 1001),
 	(1003, 'Algorítmos e Lógica de Programação', 4, '14:50', '18:20', 'Segunda', 101, 1001),
@@ -443,7 +573,7 @@ BEGIN
 	(1039, 'Inteligência Artificial', 4, '13:00', '16:30', 'Quarta', 101, 1004),
 	(1040, 'Programação para Mainframes', 4, '14:50', '18:20', 'Quarta', 101, 1004)
 
-	INSERT INTO disciplina VALUES
+	INSERT INTO disciplina (codigo, nome, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, professor_codigo)VALUES 
 	(1041, 'Desenvolvimento de Aplicações Distribuídas', 4, '13:00', '16:30', 'Segunda', 102, 1006),
 	(1042, 'Segurança de Aplicações Web', 4, '13:00', '16:30', 'Segunda', 102, 1006),
 	(1043, 'Banco de Dados NoSQL', 4, '13:00', '16:30', 'Terça', 102, 1006),
@@ -485,3 +615,8 @@ BEGIN
 	(1079, 'Engenharia de Requisitos para Sistemas Distribuídos', 4, '13:00', '16:30', 'Sexta', 102, 1012),
 	(1080, 'Kanban e Lean para Desenvolvimento de Software', 2, '13:00', '14:40', 'Sexta', 102, 1012)
 END
+use master
+DROP DATABASE springagis
+
+drop table nota_avaliacao
+drop table avaliacao

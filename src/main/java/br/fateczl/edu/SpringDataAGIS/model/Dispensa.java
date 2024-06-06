@@ -24,7 +24,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "empregado")
+@Table(name = "dispensa")
 @IdClass(DispensaId.class)
 @NamedStoredProcedureQuery(
 		name = "Dispensa.sp_alunodispensa",

@@ -4,8 +4,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -22,13 +23,12 @@ import lombok.Setter;
 @Table(name = "avaliacao")
 public class Avaliacao {
 	@Id
-	@Column(name = "avaliacao_codigo", nullable = false)
-	private int codigo;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int avaliacao_codigo;
 
 	@JoinColumn(name = "disciplina_codigo", nullable = false)
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Disciplina.class, fetch = FetchType.EAGER)
 	private Disciplina disciplina;
-	
 	
 	@Column(name = "nome", length = 20, nullable = false)
 	private String nome;

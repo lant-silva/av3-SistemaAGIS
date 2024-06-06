@@ -187,8 +187,6 @@
 						<th>Inst. Segundo Grau</th>
 						<th>Pontuação Vestibular</th>
 						<th>Posição Vestibular</th>
-						<th>Ano de Ingresso</th>
-						<th>Semestre de Ingresso</th>
 						<th>Semestre de Graduação</th>
 						<th>Semestre Limite</th>
 						<th>Curso</th>
@@ -211,8 +209,6 @@
 							<td><c:out value="${a.instituicaoSegundoGrau}" /></td>
 							<td><c:out value="${a.pontuacaoVestibular}" /></td>
 							<td><c:out value="${a.posicaoVestibular}" /></td>
-							<td><c:out value="${a.anoIngresso}" /></td>
-							<td><c:out value="${a.semestreIngresso}" /></td>
 							<td><c:out value="${a.semestreGraduacao}" /></td>
 							<td><c:out value="${a.anoLimite}" /></td>
 							<td><c:out value="${a.curso.sigla}" /></td>

@@ -69,7 +69,7 @@ public class SecretariaDispensaController {
 
     
 	private String concluirDispensa(String ra, String disciplina, String aprovacao) {
-		
+		return null;
 	}
 
 	private List<Dispensa> listarDispensas() {

@@ -14,6 +14,7 @@
 			<li class="menu-item"><a href="indexaluno">Home</a>
 			<li class="menu-item"><a href="matricula">Matricula</a>
 			<li class="menu-item"><a href="dispensa">Solicitar Dispensa</a>
+			<li class="menu-item"><a href="statusnota">Notas Parciais</a></li>
 			<li class="menu-item"><a href="index">Sair</a>
 		</ul>
 	</nav>

@@ -179,7 +179,7 @@ public class AlunoController {
 
 	private String cadastrarAluno(Aluno a) {
 		aRep.save(a);
-		mRep.sp_gerarmatricula(a.getRa());
+		int sla = mRep.sp_gerarmatricula(a.getRa());
 		return "Aluno inserido com sucesso";
 	}
 	
@@ -199,7 +199,7 @@ public class AlunoController {
 	}
 	
 	private Aluno buscarAluno(Aluno a) {
-		return aRep.findById(a.getCpf()).get();
+		return aRep.findById(a.getRa()).get();
 	}
 	
 	private List<Aluno> listarAlunos(){

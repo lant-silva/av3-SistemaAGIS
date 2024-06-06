@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,11 +24,15 @@ import lombok.ToString;
 @Entity
 @Table(name="nota_avaliacao")
 @IdClass(NotaAvaliacaoId.class)
+@NamedNativeQuery(
+		name = "NotaAvaliacao.fn_notasparciais",
+		query = "SELECT * FROM fn_notasparciais(?1)",
+		resultClass = NotaAvaliacao.class
+)
 public class NotaAvaliacao {
-	
 	@Id
-	@JoinColumn(name = "matricula_codigo", nullable = false)
 	@JoinColumn(name = "disciplina_codigo", nullable = false)
+	@JoinColumn(name = "matricula_codigo", nullable = false)
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity = MatriculaDisciplina.class, fetch = FetchType.EAGER)
 	private MatriculaDisciplina matricula;
 	
