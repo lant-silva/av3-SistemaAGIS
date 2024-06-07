@@ -10,6 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedStoredProcedureQuery;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.StoredProcedureParameter;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +28,17 @@ import lombok.ToString;
 @Entity
 @Table(name = "aula")
 @IdClass(AulaId.class)
+@NamedStoredProcedureQuery(
+		name = "Aula.sp_inseriraula",
+		procedureName = "sp_inseriraula",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "matriculaCodigo", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "disciplinaCodigo", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "presenca", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "dataAula", type = LocalDate.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
+		}
+)
 public class Aula {
 	
 	@Id

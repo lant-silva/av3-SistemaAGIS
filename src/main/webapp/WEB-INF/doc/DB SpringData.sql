@@ -284,13 +284,100 @@ select * from avaliacao where avaliacao_codigo = 100101
 select * from nota_avaliacao
 select * from disciplina where codigo = 1001
 select * from avaliacao
-select * from dbo.fn_notasparciais(202415162)
-
+select * from dbo.fn_notasparciais()
+use springagis
 delete nota_avaliacao where nota = 10
 drop table nota_avaliacao
 
 insert into nota_avaliacao (nota, avaliacao_codigo, matricula_codigo, disciplina_codigo)values
 (10, 3, 1000002, 1002)
+
+select * from fn_listaralunos(1001, 4)
+
+CREATE FUNCTION fn_listaralunos(@codigodisciplina INT, @avaliacaodisciplina INT)
+RETURNS @tabela TABLE(
+aluno_ra CHAR(9),
+aluno_nome VARCHAR(100),
+avaliacao_codigo INT,
+matricula_codigo INT,
+disciplina_codigo INT
+)
+AS
+BEGIN
+	INSERT INTO @tabela (aluno_ra, aluno_nome, avaliacao_codigo, matricula_codigo, disciplina_codigo)
+	SELECT aluno_ra = a.ra, aluno_nome = a.nome, avaliacao_codigo = av.avaliacao_codigo, matricula_codigo = m.codigo, disciplina_codigo = d.codigo
+	FROM aluno a, matricula m, matricula_disciplina md, avaliacao av, disciplina d
+	WHERE a.ra = m.aluno_ra
+		AND m.codigo = md.matricula_codigo
+		AND d.codigo = md.disciplina_codigo
+		AND d.codigo = av.disciplina_codigo
+		AND d.codigo = 1001
+		AND av.avaliacao_codigo = 4
+		AND md.situacao != 'Não cursado'
+	RETURN
+END
+
+
+CREATE PROCEDURE sp_inseriraula(@codigomatricula INT, @codigodisciplina INT, @presenca INT, @dataAula DATE, @saida VARCHAR(200) OUTPUT)
+AS
+BEGIN
+	IF EXISTS(SELECT TOP 1 * FROM aula WHERE matricula_codigo = @codigomatricula AND disciplina_codigo = @codigodisciplina AND data_aula = @dataAula)
+	BEGIN
+		RAISERROR('Chamada para o dia selecionado já foi realizada', 16, 1)
+		RETURN
+	END
+	ELSE
+	BEGIN
+		INSERT INTO aula (matricula_codigo, disciplina_codigo, data_aula, presenca)VALUES
+		(@codigomatricula, @codigodisciplina, @dataAula, @presenca)
+		 
+		--definir o total de faltas pro aluno
+		UPDATE matricula_disciplina
+		SET qtd_faltas = qtd_faltas + (4 - @presenca)
+		WHERE matricula_codigo = @codigomatricula
+			AND disciplina_codigo = @codigodisciplina
+
+		SET @saida = 'Chamada finalizada'
+	END
+END
+
+CREATE FUNCTION fn_resolveravaliacoes(@codigo INT)
+RETURNS VARCHAR
+AS
+BEGIN
+	DECLARE @avaliacaocodigo INT,
+		@matriculacodigo INT,
+		@disciplinacodigo INT,
+		@nota CHAR(3)
+
+	DECLARE cur CURSOR FOR
+	SELECT av.avaliacao_codigo, av.disciplina_codigo, md.matricula_codigo
+	FROM avaliacao av, matricula_disciplina md, disciplina d, matricula m, aluno a
+	WHERE av.disciplina_codigo = d.codigo
+		AND d.codigo = md.disciplina_codigo
+		AND md.matricula_codigo = m.codigo
+		AND a.ra = m.aluno_ra
+		AND md.situacao = 'Em curso'
+	OPEN cur
+	FETCH NEXT FROM cur INTO
+		@avaliacaocodigo, @disciplinacodigo, @matriculacodigo
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		IF(@avaliacaocodigo = @codigo)
+		BEGIN
+			INSERT INTO nota_avaliacao (avaliacao_codigo, disciplina_codigo, matricula_codigo, nota) VALUES
+			(@avaliacaocodigo, @disciplinacodigo, @matriculacodigo, 0)
+
+			FETCH NEXT FROM cur INTO
+			@avaliacaocodigo, @disciplinacodigo, @matriculacodigo
+		END
+	END
+	CLOSE cur
+	DEALLOCATE cur
+	DECLARE @saida VARCHAR(100) = 'gerado'
+	RETURN @saida
+END
+
 
 CREATE FUNCTION fn_notasparciais(@ra CHAR(9))
 RETURNS @tabela TABLE(
@@ -305,19 +392,11 @@ situacao VARCHAR(50)
 )
 AS
 BEGIN
-	DECLARE @disciplinacodigo INT,
-			@matriculacodigo INT,
-			@avaliacaocodigo INT,
-			@disciplinanome VARCHAR(100),
-			@nomeavaliacao VARCHAR(10),
-			@nota CHAR(3),
-			@notafinal CHAR(3),
-			@situacao VARCHAR(50)
-
-	DECLARE cur CURSOR FOR
-		SELECT d.codigo, av.avaliacao_codigo, m.codigo AS matricula_codigo, d.nome, av.nome, na.nota, md.nota_final
-		FROM disciplina d, avaliacao av, nota_avaliacao na, aluno a, matricula m, matricula_disciplina md
-		WHERE a.ra = 202415162
+	INSERT INTO @tabela (disciplina_codigo, avaliacao_codigo, matricula_codigo, disciplina_nome, nome_avaliacao, nota, nota_final, situacao)
+	SELECT disciplina_codigo = d.codigo, avaliacao_codigo = av.avaliacao_codigo, matricula_codigo = m.codigo,
+		   disciplina_nome = d.nome, nome_avaliacao = av.nome, nota = na.nota, nota_final = md.nota_final, situacao = md.situacao
+	FROM disciplina d, avaliacao av, nota_avaliacao na, aluno a, matricula m, matricula_disciplina md
+		WHERE a.ra = @ra
 			AND a.ra = m.aluno_ra
 			AND m.codigo = md.matricula_codigo
 			AND d.codigo = md.disciplina_codigo
@@ -325,37 +404,13 @@ BEGIN
 			AND av.avaliacao_codigo = na.avaliacao_codigo
 			AND na.disciplina_codigo = d.codigo
 			AND na.matricula_codigo = md.matricula_codigo
-
-	OPEN cur
-	FETCH NEXT FROM cur INTO
-		@disciplinacodigo, @avaliacaocodigo, @matriculacodigo, @disciplinanome, @nomeavaliacao, @nota, @notafinal
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
-		
-		IF(CAST(@nota AS INT) >= 6)
-		BEGIN
-			SET @situacao = 'Aprovado'
-		END
-		ELSE
-		IF(CAST(@nota AS INT) < 6 AND CAST(@nota AS INT) >= 4)
-		BEGIN
-			SET @situacao = 'Exame'
-		END
-		ELSE
-		BEGIN
-			SET @situacao = 'Reprovado'
-		END
-
-		INSERT INTO @tabela (disciplina_codigo, disciplina_nome, nome_avaliacao, nota, nota_final, situacao) VALUES
-		(@disciplinacodigo, @disciplinanome, @nomeavaliacao, @nota, @notafinal, @situacao)
-
-		FETCH NEXT FROM cur INTO
-		@disciplinacodigo, @avaliacaocodigo, @matriculacodigo, @disciplinanome, @nomeavaliacao, @nota, @notafinal
-	END
-	CLOSE cur
-	DEALLOCATE cur
 	RETURN
 END
+select * FROM disciplina
+SELECT * FROM dbo.fn_situacaodisciplina(1001)
+SELECT disciplina_codigo, aluno_ra, aluno_nome, disciplina_nome, qtd_faltas
+FROM fn_situacaodisciplina()
+
 
 CREATE FUNCTION fn_situacaodisciplina(@codigodisciplina INT)
 RETURNS @tabela TABLE(
@@ -363,9 +418,7 @@ disciplina_codigo INT,
 aluno_ra CHAR(9),
 aluno_nome VARCHAR(100),
 disciplina_nome VARCHAR(100),
-nota_final CHAR(3),
-qtd_faltas_semanas INT,
-qtd_faltas_total INT
+qtd_faltas INT
 )
 AS
 BEGIN
@@ -373,28 +426,31 @@ BEGIN
 			@alunora CHAR(9),
 			@alunonome VARCHAR(100),
 			@disciplinanome VARCHAR(100),
-			@notafinal CHAR(3),
-			@qtdfaltassemanas INT,
-			@qtdfaltastotal INT,
-			@qtdaulas INT
+			@qtdfaltas INT
 
 	DECLARE cur CURSOR FOR
-		SELECT d.codigo, a.ra, d.nome, a.nome, md.nota_final, md.qtd_faltas
+		SELECT DISTINCT d.codigo, a.ra, d.nome, a.nome, md.qtd_faltas
 		FROM disciplina d, matricula_disciplina md, matricula m, aluno a
 		WHERE d.codigo = md.disciplina_codigo
 		AND m.codigo = md.matricula_codigo
 		AND a.ra = m.aluno_ra
+		AND md.situacao != 'Não cursado'
 	OPEN cur
 	FETCH NEXT FROM cur INTO
-		@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @notafinal, @qtdfaltastotal
+		@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
 		IF(@codigodisciplina = @disciplinacodigo)
 		BEGIN
-			
-
+			INSERT INTO @tabela (disciplina_codigo, aluno_ra, disciplina_nome, aluno_nome, qtd_faltas) VALUES
+			(@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas)
 		END
+		FETCH NEXT FROM cur INTO
+		@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas
 	END
+	CLOSE cur
+	DEALLOCATE cur
+	RETURN
 END
 
 CREATE FUNCTION fn_listarultimamatricula(@ra char(9))

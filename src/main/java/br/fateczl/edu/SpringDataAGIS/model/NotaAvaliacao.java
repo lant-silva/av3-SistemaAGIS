@@ -29,6 +29,11 @@ import lombok.ToString;
 		query = "SELECT * FROM fn_notasparciais(?1)",
 		resultClass = NotaAvaliacao.class
 )
+@NamedNativeQuery(
+		name = "NotaAvaliacao.fn_listaralunos",
+		query = "SELECT * FROM fn_listaralunos(?1,?1)",
+		resultClass = NotaAvaliacao.class
+)
 public class NotaAvaliacao {
 	@Id
 	@JoinColumn(name = "disciplina_codigo", nullable = false)

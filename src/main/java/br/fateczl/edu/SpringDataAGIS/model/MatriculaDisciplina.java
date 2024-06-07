@@ -26,6 +26,10 @@ import lombok.ToString;
 @Table(name = "matricula_disciplina")
 @IdClass(MatriculaDisciplinaId.class)
 @NamedNativeQuery(
+		name = "MatriculaDisciplina.fn_alunochamada",
+		query = "SELECT * FROM fn_alunochamada() WHERE disciplina_codigo = :codigo"
+)
+@NamedNativeQuery(
 		name = "MatriculaDisciplina.fn_listarultimamatricula",
 		query = "SELECT * FROM fn_listarultimamatricula(?1)",
 		resultClass = MatriculaDisciplina.class

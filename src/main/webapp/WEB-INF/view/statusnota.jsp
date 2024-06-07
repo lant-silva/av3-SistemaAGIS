@@ -78,6 +78,9 @@
 							</tr>
 						</c:forEach>
 					</tbody>
+					<tfoot>
+						<tr><td><input type="submit" id="botao" name="botao" value="Gerar Relatório"></td></tr>
+					</tfoot>
 				</table>
 			</div>
 		</c:if>

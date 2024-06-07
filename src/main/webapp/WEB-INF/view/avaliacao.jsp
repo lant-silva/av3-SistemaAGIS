@@ -70,7 +70,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                         <input class="input_data" type="number" id="avaliacao_codigo" name="avaliacao_codigo" placeholder="Codigo Avaliacao" value='<c:out value="${avaliacao.avaliacao_codigo}"/>'>
+                         <input class="input_data" type="hidden" id="avaliacao_codigo" name="avaliacao_codigo" placeholder="Codigo Avaliacao" value='<c:out value="${avaliacao.avaliacao_codigo}"/>'>
                     </td>
                 </tr>
                 <tr>
@@ -137,7 +137,7 @@
                                 <td><c:out value="${a.peso}"/></td>
                                 <td>
                                    <button
-                                     onclick="window.location.href='realizaravaliacao?avaliacao_codigo=${a.avaliacao_codigo}'"
+                                     onclick="window.location.href='realizaravaliacao?disciplina_codigo=${a.disciplina.codigo}&avaliacao_codigo=${a.avaliacao_codigo }'" 
                                      class="custom-button">Realizar Avaliação
                                    </button>
                                 </td>

@@ -64,10 +64,10 @@ public class StatusNotaController {
 			model.addAttribute("erro", erro);
 			model.addAttribute("nota", na);
 			model.addAttribute("notas", notas);
+			model.addAttribute("disciplinas", disciplinas);
 		}
 		return new ModelAndView("statusnota");
 	}
-
 	private List<NotaAvaliacao> consultarNotas(String ra) {
 		return aRep.findNotasParciais(ra);
 	}
