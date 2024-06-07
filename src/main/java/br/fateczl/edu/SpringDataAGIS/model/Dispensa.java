@@ -1,6 +1,5 @@
 package br.fateczl.edu.SpringDataAGIS.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,30 +26,30 @@ import lombok.ToString;
 @Table(name = "dispensa")
 @IdClass(DispensaId.class)
 @NamedStoredProcedureQuery(
-		name = "Dispensa.sp_alunodispensa",
-		procedureName = "sp_alunodispensa",
-		parameters = {
-				@StoredProcedureParameter(mode = ParameterMode.IN, name = "ra", type = String.class),
-				@StoredProcedureParameter(mode = ParameterMode.IN, name = "disciplina", type = Integer.class),
-				@StoredProcedureParameter(mode = ParameterMode.IN, name = "motivo", type = String.class),
-				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
-		}
+    name = "Dispensa.sp_alunodispensa",
+    procedureName = "sp_alunodispensa",
+    parameters = {
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "ra", type = String.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "disciplina", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "motivo", type = String.class),
+        @StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
+    }
 )
 public class Dispensa {
-	
-	@Id
-	@JoinColumn(name = "aluno_ra", nullable = false)
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Aluno.class, fetch = FetchType.EAGER)
-	private Aluno aluno;
-	
-	@Id
-	@JoinColumn(name = "disciplina_codigo", nullable = false)
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Disciplina.class, fetch = FetchType.EAGER)
-	private Disciplina disciplina;
-	
-	@Column(name = "motivo", length = 200, nullable = false)
-	private String motivo;
-	
-	@Column(name = "estado", length = 200, nullable = false)
-	private String estado;
+
+    @Id
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "aluno_ra", referencedColumnName = "ra", nullable = false)
+    private Aluno aluno;
+
+    @Id
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "disciplina_codigo", referencedColumnName = "codigo", nullable = false)
+    private Disciplina disciplina;
+
+    @Column(name = "motivo", length = 200, nullable = false)
+    private String motivo;
+
+    @Column(name = "estado", length = 200, nullable = false)
+    private String estado;
 }
