@@ -60,7 +60,6 @@
                 <tr>
                     <td><input type="submit" id="botao" name="botao" value="Cadastrar"></td>
                     <td><input type="submit" id="botao" name="botao" value="Alterar"></td>
-                    <td><input type="submit" id="botao" name="botao" value="Excluir"></td>
                     <td><input type="submit" id="botao" name="botao" value="Listar"></td>
                 </tr>
             </table>
