@@ -15,6 +15,7 @@
 </head>
 <body>
 	<h1 class="gerenciamento-matricula">Consulta Geral de Faltas</h1>
+	<div class="container">
 	<form action="statusfalta" method="post">
 		<div align="center" class="container">
 			<table>
@@ -69,6 +70,7 @@
 			</table>
 		</div>
 	</form>
+	</div>
 	<br />
 	<div align="center">
 		<c:if test="${not empty saida}">
