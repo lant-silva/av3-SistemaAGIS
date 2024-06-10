@@ -278,14 +278,15 @@ BEGIN
 		SET @saida = 'Chamada finalizada'
 	END
 END
-GOF
+GO
+
 CREATE FUNCTION fn_notasparciais(@ra CHAR(9))
 RETURNS @tabela TABLE(
 disciplina_codigo INT,
 avaliacao_codigo INT,
 matricula_codigo INT,
 disciplina_nome VARCHAR(100),
-nome_avaliacao VARCHAR(10),
+nome_avaliacao VARCHAR(50),
 nota CHAR(3),
 nota_final CHAR(3),
 situacao VARCHAR(50)
@@ -453,7 +454,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		INSERT INTO dispensa VALUES
+		INSERT INTO dispensa (aluno_ra, disciplina_codigo, motivo, estado)VALUES
 		(@alunora, @codigodisciplina, @motivo, 'Em andamento')
 		SET @saida = 'Dispensa solicitada'
 	END
@@ -584,3 +585,38 @@ BEGIN
 		WHERE disciplina_codigo = @disciplinacodigo
 			AND matricula_codigo = @matriculacodigo
 END
+GO
+CREATE VIEW v_aluno_chamada
+AS
+SELECT DISTINCT a.nome AS nome, a.ra AS ra, d.codigo AS disciplina_codigo, m.aluno_ra AS aluno_ra
+FROM aluno a, matricula m, matricula_disciplina md, disciplina d
+WHERE m.aluno_ra = a.ra
+	AND md.matricula_codigo = m.codigo
+	AND md.disciplina_codigo = d.codigo
+	AND md.situacao = 'Em curso'
+GO
+INSERT INTO curso (codigo, nome, carga_horaria, sigla, nota_enade) VALUES
+(101, 'Análise e Desenvolvimento de Sistemas', 2800, 'ADS', 5)
+GO
+INSERT INTO professor (codigo, nome, titulacao) VALUES
+(1001, 'Marcelo Silva', 'Mestre'),
+(1002, 'Rafael Medeiros', 'Mestre'),
+(1003, 'Adriana Bastos', 'Doutora'),
+(1004, 'Henrique Galvão', 'Mestre'),
+(1005, 'Ulisses Santos Barbosa', 'Doutor'),
+(1006, 'Pedro Guimarães', 'Mestre'),
+(1007, 'Reinaldo Santos', 'Doutor'),
+(1008, 'Pedro Lima', 'Mestre'),
+(1009, 'Marcelo Soares', 'Doutor'),
+(1010, 'Costa Lima de Souza', 'Mestre'),
+(1011, 'Gabriela Gonçalves', 'Doutora'),
+(1012, 'Yasmin Ribeiro', 'Mestre')
+GO
+INSERT INTO disciplina (codigo, nome, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, professor_codigo) VALUES
+(1001, 'Laboratório de Banco de Dados', 4, '14:50', '18:20', 'Segunda', 101, 1001),
+(1002, 'Banco de Dados', 4, '14:50', '18:20', 'Terça', 101, 1001),
+(1003, 'Estruturas de Dados', 2, '13:00', '14:40', 'Quinta', 101, 1001),
+(1004, 'Arquitetura e Organização de Computadores', 4, '13:00', '16:30', 'Segunda', 101, 1001),
+(1005, 'Laboratório de Hardware', 4, '13:00', '16:30', 'Quarta', 101, 1001),
+(1006, 'Sistemas Operacionais', 4, '14:50', '18:20', 'Quinta', 101, 1001),
+(1007, 'Metodologia de Pesquisa Científico Tecnológica', 4, '14:50', '18:20', 'Sexta', 101, 1001)

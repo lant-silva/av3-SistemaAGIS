@@ -16,6 +16,7 @@
 </header>
 </head>
 <body>
+	<h1 class="gerenciamento-matricula">Avaliação</h1>
 	<div class="container">
 		<form action="realizaravaliacao" method="post">
 			<input type="hidden" name="disciplina_codigo"
@@ -47,5 +48,17 @@
 			</div>
 		</form>
 	</div>
+	<br />
+    <div align="center">
+        <c:if test="${not empty saida}">
+            <h2><b><c:out value="${saida}"/></b></h2>
+        </c:if>
+    </div>
+    <br />
+    <div align="center">
+        <c:if test="${not empty erro}">
+            <h2><b><c:out value="${erro}"/></b></h2>
+        </c:if>
+    </div>
 </body>
 </html>

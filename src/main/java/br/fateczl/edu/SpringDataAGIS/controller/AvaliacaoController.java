@@ -107,7 +107,8 @@ public class AvaliacaoController {
 	}
 
 	private String cadastrarAvaliacao(Avaliacao a) throws Exception{
-		if(validarPesos(a)) {			
+		String acao = "cadastrar";
+		if(validarPesos(a, acao)) {			
 			aRep.save(a);
 		}else {
 			throw new Exception("A soma dos pesos das avaliações devem resultar em 1");
@@ -116,7 +117,8 @@ public class AvaliacaoController {
 	}
 
 	private String alterarAvaliacao(Avaliacao a) throws Exception {
-		if(validarPesos(a)) {
+		String acao = "alterar";
+		if(validarPesos(a, acao)) {
 			aRep.save(a);
 		}else {
 			throw new Exception("A soma dos pesos das avaliações devem resultar em 1");
@@ -156,16 +158,22 @@ public class AvaliacaoController {
 		}
 	}
 
-	private boolean validarPesos(Avaliacao a) {
+	private boolean validarPesos(Avaliacao a, String acao) {
 		Disciplina d = a.getDisciplina();
 		List<Avaliacao> avaliacoes = aRep.findAll();
 		float soma = 0;
 		for(Avaliacao av : avaliacoes) {
 			if(av.getDisciplina().getCodigo() == d.getCodigo()) {
-				soma += av.getPeso();
+				if(acao.equals("alterar") && av.getAvaliacao_codigo() == a.getAvaliacao_codigo()) {
+					soma += a.getPeso();
+				}else {					
+					soma += av.getPeso();
+				}
 			}
 		}
-		soma += a.getPeso();
+		if(acao.equals("cadastrar")) {			
+			soma += a.getPeso();
+		}
 		if(soma <= 1.0) {
 			return true;
 		}else {

@@ -97,7 +97,7 @@
 						<tr>
 							<td>Disciplina</td>
 							<td>Avaliação</td>
-							<td>Nota</td>
+							<td>Média</td>
 						</tr>
 					</thead>
 					<tbody>

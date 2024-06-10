@@ -185,12 +185,7 @@ public class AlunoController {
 	}
 	
 	private String atualizarAluno(Aluno a) throws Exception{
-		
-		if(aRep.findById(a.getRa()).isEmpty()) {
-			throw new Exception("Aluno não encontrado");
-		}else{
-			aRep.save(a);
-		}
+		aRep.save(a);
 		return "Aluno atualizado com sucesso";
 	}
 	

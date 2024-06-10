@@ -59,7 +59,7 @@ public class RealizarAvaliacaoController {
     	int disciplina = Integer.parseInt(allRequestParam.get("disciplina_codigo"));
     	String[] codigos = new String[100];
     	String[] nota = new String[100];
-    	
+
     	try {
     		if(cmd.contains("Salvar")) {
     			for(String key : parametros.keySet()) {

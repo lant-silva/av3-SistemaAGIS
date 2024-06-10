@@ -12,7 +12,7 @@ import br.fateczl.edu.SpringDataAGIS.model.Aluno;
 import br.fateczl.edu.SpringDataAGIS.model.Aula;
 
 public interface IAulaRepository extends JpaRepository<Aula, Integer>{
-	@Query(value = "SELECT * FROM v_aluno_chamada WHERE codigo_disciplina = :codigoDisciplina", nativeQuery = true)
+	@Query(value = "SELECT * FROM v_aluno_chamada WHERE disciplina_codigo = :codigoDisciplina", nativeQuery = true)
 	List<Aluno> listarAlunos(@Param("codigoDisciplina") int disciplina);	
 	
 	@Procedure(name = "Aula.sp_verificaraula")

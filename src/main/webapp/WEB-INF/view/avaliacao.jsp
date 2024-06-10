@@ -39,17 +39,20 @@
                     </td>
                     <td><input type="submit" id="botao" name="botao" value="Listar Av. por Disciplina"></td>
                 </tr>
-                <tr>
+                <tr>	
+                	<td><label for="avaliacao_codigo">Código:</label></td>
                     <td colspan="3">
                          <input class="input_data" type="text" id="avaliacao_codigo" name="avaliacao_codigo" placeholder="Codigo Avaliacao" value='<c:out value="${avaliacao.avaliacao_codigo}"/>'>
                     </td>
                 </tr>
                 <tr>
+                	<td><label for="nome">Nome:</label></td>
                     <td colspan="3">
                         <input class="input_data" type="text" maxlength="100" id="nome" name="nome" placeholder="Nome" value='<c:out value="${avaliacao.nome}"/>'>
                     </td>
                 </tr>
                 <tr>
+                	<td><label for="peso">Peso:</label></td>
                     <td colspan="3">
                         <input class="input_data" type="text" id="peso" name="peso" placeholder="Peso" value='<c:out value="${avaliacao.peso}"/>'>
                     </td>

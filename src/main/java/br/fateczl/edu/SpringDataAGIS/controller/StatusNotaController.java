@@ -42,20 +42,6 @@ public class StatusNotaController {
 		try {
 			if(cmd.contains("Consultar")) {
 				notas = consultarNotas(ra);
-				for(NotaAvaliacao a : notas) {
-					NotaAvaliacao aux = new NotaAvaliacao();
-					String disc = "";
-					disc = a.getMatricula().getDisciplina().getNome();
-					if(!aux.getAvaliacao().getDisciplina().getNome().equals(disc)) {
-						Disciplina dAux = new Disciplina();
-						dAux.setNome(disc);
-						MatriculaDisciplina mdAux = new MatriculaDisciplina();
-						mdAux.setDisciplina(dAux);
-						mdAux.setNotaFinal(a.getMatricula().getNotaFinal());
-						mdAux.setSituacao(a.getMatricula().getSituacao());
-						disciplinas.add(aux);
-					}
-				}
 			}
 		} catch (Exception e) {
 			erro = e.getMessage();

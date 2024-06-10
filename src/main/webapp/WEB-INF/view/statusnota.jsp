@@ -14,7 +14,7 @@
 </header>
 </head>
 <body>
-	<h1 align="center">Consulta de Notas</h1>
+	<h1 class="gerenciamento-matricula">Notas Parciais</h1>
 	<div align="center" class="container">
 		<form action="statusnota" method="post">
 			<table>
@@ -61,9 +61,6 @@
 						</c:forEach>
 					</tbody>
 				</table>
-					<div align="center">
-						<tr><td><input type="submit" id="botao" name="botao" value="Gerar Relatório"></td></tr>
-					</div>
 			</div>
 		</c:if>
 	</div>

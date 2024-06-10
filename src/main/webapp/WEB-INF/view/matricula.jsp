@@ -49,7 +49,7 @@
 			</c:if>
 		</div>
 		</br>
-		<div align="center">
+		<div align="center" class="container">
 			<c:if test="${not empty disciplinas and listar eq 'false'}">
 				<table id="listaDisciplinas" class="table_round" align="center">
 					<thead>

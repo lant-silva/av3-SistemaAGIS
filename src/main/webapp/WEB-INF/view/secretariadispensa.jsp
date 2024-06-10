@@ -36,7 +36,7 @@
                             <tr id="dispensa_${d.aluno.ra}_${d.disciplina.codigo}">
                                 <td><c:out value="${d.aluno.ra}" /></td>
                                 <td><c:out value="${d.aluno.nome}" /></td>
-                                <td><c:out value="${d.nomeCurso}" /></td>
+                                <td><c:out value="${d.disciplina.curso.nome}" /></td>
                                 <td><c:out value="${d.disciplina.nome}" /></td>
                                 <td><c:out value="${d.motivo}" /></td>
 
