@@ -8,13 +8,13 @@
 <title>AGIS - Histórico</title>
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
 <header>
-	<h1 align="center">Histórico do Aluno</h1>
 	<div>
 		<jsp:include page="menusecretaria.jsp" />
 	</div>
 </header>
 </head>
 <body>
+	<h1 class="gerenciamento-matricula">Consulta de Histórico</h1>
 	<form action="historico" method="post">
 		<div align="center" class="container">
 			<tr>

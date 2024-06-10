@@ -9,6 +9,9 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedNativeQuery;
+import jakarta.persistence.NamedStoredProcedureQuery;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.StoredProcedureParameter;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,9 +34,21 @@ import lombok.ToString;
 )
 @NamedNativeQuery(
 		name = "NotaAvaliacao.fn_listaralunos",
-		query = "SELECT * FROM fn_listaralunos(?1,?1)",
+		query = "SELECT * FROM fn_listaralunos(?1,?2)",
 		resultClass = NotaAvaliacao.class
 )
+@NamedStoredProcedureQuery(
+		name = "NotaAvaliacao.sp_salvarnota",
+		procedureName = "sp_salvarnota",
+		parameters = {
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "avaliacao", type = Integer.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "disciplina", type = Integer.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "matricula", type = Integer.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "nota", type = Float.class),
+			@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
+		}
+)
+
 public class NotaAvaliacao {
 	@Id
 	@JoinColumn(name = "disciplina_codigo", nullable = false)

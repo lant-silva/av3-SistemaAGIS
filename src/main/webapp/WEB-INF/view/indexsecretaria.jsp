@@ -8,13 +8,12 @@
 <title>AGIS - Secretaria</title>
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
 <header>
-	<h1 align="center">Portal Secretaria</h1>
 	<div>
 		<jsp:include page="menusecretaria.jsp" />
 	</div>
 </header>
 </head>
 <body>
-
+	<h1 class="gerenciamento-matricula">Portal da Secretaria</h1>
 </body>
 </html>

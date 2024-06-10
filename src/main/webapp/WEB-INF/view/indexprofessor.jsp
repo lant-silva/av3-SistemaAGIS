@@ -7,13 +7,12 @@
 <meta charset="ISO-8859-1">
 <title>AGIS - Professor</title>
 <header>
-	<h1 align="center">Portal Professor</h1>
 	<div>
 		<jsp:include page="menuprofessor.jsp" />
 	</div>
 </header>
 </head>
 <body>
-
+	<h1 class="gerenciamento-matricula">Portal do Professor</h1>
 </body>
 </html>

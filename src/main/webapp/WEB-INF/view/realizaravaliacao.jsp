@@ -10,13 +10,16 @@
 <title>Realizar Avaliação</title>
 <header>
 	<h1 align="center">Faltas Parciais</h1>
+	<div>
+        <jsp:include page="menuprofessor.jsp" />
+    </div>
 </header>
 </head>
 <body>
 	<div class="container">
 		<form action="realizaravaliacao" method="post">
-			<input type="hidden" name="codigodisciplina"
-				value="${param.codigodisciplina}"> <input type="hidden"
+			<input type="hidden" name="disciplina_codigo"
+				value="${param.disciplina_codigo}"> <input type="hidden"
 				name="avaliacao_codigo" value="${param.avaliacao_codigo}">
 
 			<table class="table-round">
@@ -28,10 +31,11 @@
 				</thead>
 				<tbody>
 					<c:forEach var="a" items="${alunos}">
+					<input type="hidden" name="matriculaCodigo" value="${a.matricula.matricula.codigo }"/>
 						<tr>
 							<td><c:out value="${a.matricula.matricula.aluno.nome}" /></td>
-							<td><input type="number" name="notas[${aluno.id}]"
-								value="<c:out value='${aluno.nota}'/>" min="0" max="10"
+							<td><input type="number" name="nota"
+								value="<c:out value='${a.nota}'/>" min="0" max="10"
 								step="0.01"></td>
 						</tr>
 					</c:forEach>
@@ -39,7 +43,7 @@
 			</table>
 
 			<div align="center">
-				<button type="submit" class="save-button">Salvar Notas</button>
+				<input type="submit" id="botao" name="botao" value="Salvar"></input>
 			</div>
 		</form>
 	</div>

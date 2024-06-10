@@ -1,11 +1,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+    pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>AGIS - Faltas dos Alunos</title>
+<title>AGIS - Notas dos Alunos</title>
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
 <header>
 	<div>
@@ -14,9 +14,10 @@
 </header>
 </head>
 <body>
-	<h1 class="gerenciamento-matricula">Consulta Geral de Faltas</h1>
-	<form action="statusfalta" method="post">
-		<div align="center" class="container">
+	<h1 class="gerenciamento-matricula">Consulta Geral de Notas</h1>
+	<div align="center" class="container">
+		<div class="container">
+	<form action="relatorionota" method="post">
 			<table>
 				<tr>
 					<td><label>Escolha uma Disciplina</label></td>
@@ -40,10 +41,10 @@
 					<td><input type="submit" id="botao" name="botao" value="Listar"></td>
 				</tr>
 			</table>
-		</div>
 	</form>
-	<form action="relatoriofalta" method="post" target="_blank">
-		<div align="center" class="container">
+		</div>
+		<div class="container">
+			<form action="relatorionotas" method="post" target="_blank">
 			<table>
 				<tr>
 					<td><label>Escolha uma Disciplina</label></td>
@@ -64,11 +65,13 @@
 								</c:if>
 							</c:forEach>
 					</select></td>
-					<td><input type="submit" id="botao" name="botao" value="Gerar Relatório"></td>
+					<td><input type="submit" id="botao" name="botao" value="Gerar Relatório :D"></td>
 				</tr>
 			</table>
+		</form>
 		</div>
-	</form>
+		</div>
+	
 	<br />
 	<div align="center">
 		<c:if test="${not empty saida}">
@@ -92,20 +95,18 @@
 				<table class="table-round">
 					<thead>
 						<tr>
-							<td>R.A</td>
-							<td>Nome</td>
-							<td>Numero de Faltas</td>
-							<td>Situação</td>
+							<td>Disciplina</td>
+							<td>Avaliação</td>
+							<td>Nota</td>
 						</tr>
 					</thead>
 					<tbody>
-						<c:forEach var="a" items="${alunos }">						
+						<c:forEach var="a" items="${alunos }">
 							<tr>
-								<td><c:out value="${a.matricula.aluno.ra}"/></td>
-							 	<td><c:out value="${a.matricula.aluno.nome}"/></td>
-								<td><c:out value="${a.qtdFaltas}"/></td>
-							 	<td><c:out value="${a.situacao}"/></td>
-						 	</tr>
+								<td><c:out value="${a.matricula.aluno.ra}" /></td>
+								<td><c:out value="${a.matricula.aluno.nome }" /></td>
+								<td><c:out value="${a.notaFinal }" /></td>
+							</tr>
 						</c:forEach>
 					</tbody>
 				</table>

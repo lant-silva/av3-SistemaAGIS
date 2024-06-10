@@ -14,7 +14,7 @@
 </header>
 </head>
 <body>
-	<h1 align="center">Notas Parciais</h1>
+	<h1 align="center">Consulta de Notas</h1>
 	<div align="center" class="container">
 		<form action="statusnota" method="post">
 			<table>
@@ -43,24 +43,6 @@
 	<div align="center">
 		<c:if test="${not empty notas }">
 			<div class="container">
-			<table>
-				<thead>
-					<tr>
-						<td>Disciplina</td>
-						<td>Media</td>
-						<td>Situação</td>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="d" items="${disciplinas }">
-						<tr>
-							<td><c:out value="${d.matricula.disciplina.nome }" /></td>
-							<td><c:out value="${d.matricula.notaFinal }" /></td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-			</br>
 				<table class="table-round">
 					<thead>
 						<tr>
@@ -78,10 +60,10 @@
 							</tr>
 						</c:forEach>
 					</tbody>
-					<tfoot>
-						<tr><td><input type="submit" id="botao" name="botao" value="Gerar Relatório"></td></tr>
-					</tfoot>
 				</table>
+					<div align="center">
+						<tr><td><input type="submit" id="botao" name="botao" value="Gerar Relatório"></td></tr>
+					</div>
 			</div>
 		</c:if>
 	</div>

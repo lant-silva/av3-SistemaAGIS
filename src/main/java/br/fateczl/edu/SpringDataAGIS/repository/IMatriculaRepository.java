@@ -20,6 +20,9 @@ public interface IMatriculaRepository extends JpaRepository<Matricula, Integer>{
                    "AND m.aluno_ra = a.ra", nativeQuery = true)
     List<Object[]> findUltimaMatricula(@Param("codigoMatricula") Integer codigoMatricula);
     
+    @Query(value = "SELECT TOP 1 codigo, aluno_ra, data_matricula FROM matricula WHERE aluno_ra = :ra ORDER BY codigo DESC", nativeQuery = true)
+    Matricula consultarUltimaMatricula(@Param("ra") String ra);
+    
     @Procedure(name = "Matricula.sp_gerarmatricula")
     int sp_gerarmatricula(@Param("ra") String ra);
     

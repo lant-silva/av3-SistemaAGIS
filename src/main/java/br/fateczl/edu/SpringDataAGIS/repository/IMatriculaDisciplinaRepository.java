@@ -13,6 +13,10 @@ import br.fateczl.edu.SpringDataAGIS.model.MatriculaDisciplina;
 public interface IMatriculaDisciplinaRepository extends JpaRepository<MatriculaDisciplina, Integer> {
 	List<MatriculaDisciplina> fn_listarultimamatricula(String ra);
 	
+	@Query(value = "SELECT * FROM fn_situacaodisciplina()" +
+			"WHERE disciplina_codigo = :disciplinaCodigo", nativeQuery = true)
+	List<MatriculaDisciplina> listarAlunos(@Param("disciplinaCodigo") Integer disciplinaCodigo);
+	
 	@Query(nativeQuery = true, name = "MatriculaDisciplina.fn_alunochamada")
 	List<MatriculaDisciplina> fn_alunochamada(@Param("codigo") int disciplinaCodigo);
 }

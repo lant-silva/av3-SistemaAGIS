@@ -14,7 +14,7 @@
 </header>
 </head>
 <body>
-	<h1 class="requisicao-dispensa">Requisição de Dispensa</h1>
+	<h1 class="gerenciamento-matricula">Solicitação de Dispensa</h1>
 	<div align="center" class="container">
 		<form action="dispensa" method="post">
 			<table>

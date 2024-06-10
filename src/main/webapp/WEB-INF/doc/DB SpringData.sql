@@ -1,6 +1,7 @@
 CREATE DATABASE springagis
+GO
 USE springagis
-
+GO
 CREATE TRIGGER t_validarcpf ON aluno
 AFTER INSERT
 AS
@@ -64,7 +65,7 @@ BEGIN
 		RETURN
 	END
 END
-
+GO
 CREATE TRIGGER t_validaridade ON aluno
 AFTER INSERT, UPDATE
 AS
@@ -78,62 +79,7 @@ BEGIN
 		RETURN
 	END
 END
-
-CREATE PROCEDURE sp_geraranolimite(@ano CHAR(4), @sem CHAR(1), @anolimite CHAR(6) OUTPUT)
-AS
-BEGIN
-SET @ano = CAST((CAST(@ano AS INT) + 5) AS CHAR)
-
-IF(@sem = '1')
-BEGIN
-	SET @sem = '2'
-END
-ELSE
-BEGIN
-	SET @sem = '1'
-END
-SET @anolimite = FORMATMESSAGE('%s/%s', @ano, @sem)
-END
-
-
-
-CREATE PROCEDURE sp_gerarra(@ano CHAR(4), @sem CHAR(1), @ra CHAR(9) OUTPUT)
-AS
-
-DECLARE @existe BIT = 1
-WHILE(@existe = 1)
-BEGIN
-	DECLARE @n1 CHAR(1) = CAST(RAND()*10+1 AS CHAR)
-	DECLARE @n2 CHAR(1) = CAST(RAND()*10+1 AS CHAR)
-	DECLARE @n3 CHAR(1) = CAST(RAND()*10+1 AS CHAR)
-	DECLARE @n4 CHAR(1) = CAST(RAND()*10+1 AS CHAR)
-	
-	SET @ra = @ano + @sem + @n1 + @n2 + @n3 + @n4
-	
-	-- Verifica se o RA gerado já pertence a um aluno, caso contrário, outro RA vai ser gerado
-	IF EXISTS(SELECT ra FROM aluno WHERE ra = @ra)
-	BEGIN 
-		SET @existe = 1
-	END
-	ELSE 
-	BEGIN 
-		SET @existe = 0
-	END
-END
-
-select * from aluno
-
-declare @codigomatricula INT
-exec sp_gerarmatricula 202413924, @codigomatricula OUTPUT
-print @codigomatricula
-
-delete aluno
-
-select * from matricula
-select * from matricula_disciplina
-
-delete matricula where codigo = 1000002
-
+GO
 CREATE PROCEDURE sp_gerarmatricula(@ra CHAR(9), @codigomatricula INT OUTPUT)
 AS
 BEGIN
@@ -187,7 +133,7 @@ BEGIN
 		SELECT * FROM dbo.fn_matriculainicial(@codigomatricula)
 	END
 END
-
+GO
 CREATE PROCEDURE sp_inserirmatricula(@ra CHAR(9), @codigomatricula INT, @codigodisciplina INT, @saida VARCHAR(200) OUTPUT)
 AS
 DECLARE @conflito BIT,
@@ -228,7 +174,7 @@ BEGIN
 	RAISERROR('Matricula cancelada: Existe conflito de horários', 16, 1)
 	RETURN
 END
-
+GO
 CREATE FUNCTION fn_ultimamatricula(@codigomatricula INT)
 RETURNS @tabela TABLE(
 matricula_codigo INT,
@@ -248,8 +194,7 @@ BEGIN
 		AND m.aluno_ra = a.ra
 	RETURN
 END
-
-
+GO
 CREATE PROCEDURE sp_verificarconflitohorario(@codigomatricula INT, @qtdaulas INT, @diasemana VARCHAR(50), @horarioinicio TIME, @horariofim TIME, @conflito BIT OUTPUT)
 AS
 DECLARE @conflitoexiste INT
@@ -273,51 +218,44 @@ ELSE
 BEGIN
 	SET @conflito = 0
 END
-
-delete matricula_disciplina
-delete matricula
-delete aluno
-select * from matricula
-select * from matricula_disciplina where matricula_codigo = 1000004 and disciplina_codigo = 1001
-select * from dbo.fn_listarultimamatricula(202410000)
-select * from avaliacao where avaliacao_codigo = 100101
-select * from nota_avaliacao
-select * from disciplina where codigo = 1001
-select * from avaliacao
-select * from dbo.fn_notasparciais()
-use springagis
-delete nota_avaliacao where nota = 10
-drop table nota_avaliacao
-
-insert into nota_avaliacao (nota, avaliacao_codigo, matricula_codigo, disciplina_codigo)values
-(10, 3, 1000002, 1002)
-
-select * from fn_listaralunos(1001, 4)
-
+GO
+CREATE PROCEDURE sp_salvarnota(@avaliacaocodigo INT, @disciplinacodigo INT, @matriculacodigo INT, @nota FLOAT, @saida VARCHAR(200) OUTPUT)
+AS
+BEGIN
+	UPDATE nota_avaliacao
+	SET nota = @nota
+	WHERE avaliacao_codigo = @avaliacaocodigo
+	AND disciplina_codigo = @disciplinacodigo
+	AND matricula_codigo = @matriculacodigo
+END
+GO
 CREATE FUNCTION fn_listaralunos(@codigodisciplina INT, @avaliacaodisciplina INT)
 RETURNS @tabela TABLE(
 aluno_ra CHAR(9),
 aluno_nome VARCHAR(100),
 avaliacao_codigo INT,
 matricula_codigo INT,
-disciplina_codigo INT
+disciplina_codigo INT,
+nota FLOAT
 )
 AS
 BEGIN
-	INSERT INTO @tabela (aluno_ra, aluno_nome, avaliacao_codigo, matricula_codigo, disciplina_codigo)
-	SELECT aluno_ra = a.ra, aluno_nome = a.nome, avaliacao_codigo = av.avaliacao_codigo, matricula_codigo = m.codigo, disciplina_codigo = d.codigo
-	FROM aluno a, matricula m, matricula_disciplina md, avaliacao av, disciplina d
+	INSERT INTO @tabela (aluno_ra, aluno_nome, avaliacao_codigo, matricula_codigo, disciplina_codigo, nota)
+	SELECT aluno_ra = a.ra, aluno_nome = a.nome, avaliacao_codigo = av.avaliacao_codigo, matricula_codigo = m.codigo, disciplina_codigo = d.codigo, na.nota
+	FROM aluno a, matricula m, matricula_disciplina md, avaliacao av, disciplina d, nota_avaliacao na
 	WHERE a.ra = m.aluno_ra
 		AND m.codigo = md.matricula_codigo
 		AND d.codigo = md.disciplina_codigo
 		AND d.codigo = av.disciplina_codigo
-		AND d.codigo = 1001
-		AND av.avaliacao_codigo = 4
+		AND d.codigo = na.disciplina_codigo
+		AND d.codigo = @codigodisciplina
+		AND av.avaliacao_codigo = @avaliacaodisciplina
 		AND md.situacao != 'Não cursado'
+		AND av.avaliacao_codigo = na.avaliacao_codigo
+		AND na.matricula_codigo = m.codigo
 	RETURN
 END
-
-
+GO
 CREATE PROCEDURE sp_inseriraula(@codigomatricula INT, @codigodisciplina INT, @presenca INT, @dataAula DATE, @saida VARCHAR(200) OUTPUT)
 AS
 BEGIN
@@ -340,45 +278,7 @@ BEGIN
 		SET @saida = 'Chamada finalizada'
 	END
 END
-
-CREATE FUNCTION fn_resolveravaliacoes(@codigo INT)
-RETURNS VARCHAR
-AS
-BEGIN
-	DECLARE @avaliacaocodigo INT,
-		@matriculacodigo INT,
-		@disciplinacodigo INT,
-		@nota CHAR(3)
-
-	DECLARE cur CURSOR FOR
-	SELECT av.avaliacao_codigo, av.disciplina_codigo, md.matricula_codigo
-	FROM avaliacao av, matricula_disciplina md, disciplina d, matricula m, aluno a
-	WHERE av.disciplina_codigo = d.codigo
-		AND d.codigo = md.disciplina_codigo
-		AND md.matricula_codigo = m.codigo
-		AND a.ra = m.aluno_ra
-		AND md.situacao = 'Em curso'
-	OPEN cur
-	FETCH NEXT FROM cur INTO
-		@avaliacaocodigo, @disciplinacodigo, @matriculacodigo
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
-		IF(@avaliacaocodigo = @codigo)
-		BEGIN
-			INSERT INTO nota_avaliacao (avaliacao_codigo, disciplina_codigo, matricula_codigo, nota) VALUES
-			(@avaliacaocodigo, @disciplinacodigo, @matriculacodigo, 0)
-
-			FETCH NEXT FROM cur INTO
-			@avaliacaocodigo, @disciplinacodigo, @matriculacodigo
-		END
-	END
-	CLOSE cur
-	DEALLOCATE cur
-	DECLARE @saida VARCHAR(100) = 'gerado'
-	RETURN @saida
-END
-
-
+GOF
 CREATE FUNCTION fn_notasparciais(@ra CHAR(9))
 RETURNS @tabela TABLE(
 disciplina_codigo INT,
@@ -406,30 +306,33 @@ BEGIN
 			AND na.matricula_codigo = md.matricula_codigo
 	RETURN
 END
-select * FROM disciplina
-SELECT * FROM dbo.fn_situacaodisciplina(1001)
-SELECT disciplina_codigo, aluno_ra, aluno_nome, disciplina_nome, qtd_faltas
-FROM fn_situacaodisciplina()
-
-
-CREATE FUNCTION fn_situacaodisciplina(@codigodisciplina INT)
+GO
+CREATE FUNCTION fn_situacaodisciplina()
 RETURNS @tabela TABLE(
 disciplina_codigo INT,
+matricula_codigo INT,
 aluno_ra CHAR(9),
 aluno_nome VARCHAR(100),
 disciplina_nome VARCHAR(100),
-qtd_faltas INT
+qtd_faltas INT,
+nota_final CHAR(3),
+situacao VARCHAR(50),
+situacao_nota VARCHAR(50)
 )
 AS
 BEGIN
 	DECLARE @disciplinacodigo INT,
+			@matriculacodigo INT,
 			@alunora CHAR(9),
 			@alunonome VARCHAR(100),
 			@disciplinanome VARCHAR(100),
-			@qtdfaltas INT
+			@qtdfaltas INT,
+			@situacao VARCHAR(50),
+			@notafinal CHAR(3),
+			@situacaonota VARCHAR(50)
 
 	DECLARE cur CURSOR FOR
-		SELECT DISTINCT d.codigo, a.ra, d.nome, a.nome, md.qtd_faltas
+		SELECT DISTINCT d.codigo, m.codigo, a.ra, d.nome, a.nome, md.qtd_faltas, md.nota_final
 		FROM disciplina d, matricula_disciplina md, matricula m, aluno a
 		WHERE d.codigo = md.disciplina_codigo
 		AND m.codigo = md.matricula_codigo
@@ -437,22 +340,45 @@ BEGIN
 		AND md.situacao != 'Não cursado'
 	OPEN cur
 	FETCH NEXT FROM cur INTO
-		@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas
+		@disciplinacodigo, @matriculacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas, @notafinal
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		IF(@codigodisciplina = @disciplinacodigo)
+		DECLARE @qtdaulas INT
+		SELECT @qtdaulas = qtd_aulas FROM disciplina WHERE codigo = @disciplinacodigo
+		IF(@qtdfaltas > (@qtdaulas * 5))
 		BEGIN
-			INSERT INTO @tabela (disciplina_codigo, aluno_ra, disciplina_nome, aluno_nome, qtd_faltas) VALUES
-			(@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas)
+			SET @situacao = 'Reprovado por falta'
 		END
+		ELSE
+		BEGIN
+			SET @situacao = 'Aprovado por falta'
+		END
+		
+		IF(CAST(@notafinal AS FLOAT) >= 6)
+		BEGIN
+			SET @situacaonota = 'Aprovado por Nota'
+		END
+		ELSE
+		IF(CAST(@notafinal AS FLOAT) < 6 AND CAST(@notafinal AS FLOAT) >= 4)
+		BEGIN
+			SET @situacaonota = 'Em exame'
+		END
+		ELSE
+		BEGIN
+			SET @situacaonota = 'Reprovado por Nota'
+		END
+
+			INSERT INTO @tabela (disciplina_codigo, matricula_codigo, aluno_ra, disciplina_nome, aluno_nome, qtd_faltas, situacao, nota_final, situacao_nota) VALUES
+			(@disciplinacodigo, @matriculacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas, @situacao, @notafinal, @situacaonota)
+
 		FETCH NEXT FROM cur INTO
-		@disciplinacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas
+		@disciplinacodigo, @matriculacodigo, @alunora, @disciplinanome, @alunonome, @qtdfaltas, @notafinal
 	END
 	CLOSE cur
 	DEALLOCATE cur
 	RETURN
 END
-
+GO
 CREATE FUNCTION fn_listarultimamatricula(@ra char(9))
 RETURNS @tabela TABLE(
 matricula_codigo INT,
@@ -510,7 +436,7 @@ BEGIN
 	ORDER BY situacao ASC
 	RETURN
 END
-
+GO
 CREATE PROCEDURE sp_alunodispensa(@alunora CHAR(9), @codigodisciplina INT, @motivo VARCHAR(200), @saida VARCHAR(200) OUTPUT)
 AS
 BEGIN
@@ -532,9 +458,7 @@ BEGIN
 		SET @saida = 'Dispensa solicitada'
 	END
 END
-
-select * from matricula_disciplina
-
+GO
 CREATE FUNCTION fn_matriculainicial(@codigomatricula INT)
 RETURNS @tabela TABLE(
 matricula_codigo INT,
@@ -554,125 +478,109 @@ BEGIN
 		AND m.aluno_ra = a.ra
 	RETURN
 END
-
-
-declare @codigomatricula int = 1000001
-select * from dbo.fn_matriculainicial(@codigomatricula)
-
-exec sp_teste
-
-select * from aluno
-
-select * from curso
-select * from matricula_disciplina
-
-CREATE PROCEDURE sp_teste
+GO
+CREATE FUNCTION fn_alunochamada()
+RETURNS @tabela TABLE(
+aluno_nome VARCHAR(100),
+aluno_ra CHAR(9),
+disciplina_codigo INT,
+matricula_codigo INT
+)
 AS
 BEGIN
-	INSERT INTO curso (codigo, carga_horaria, nome, nota_enade, sigla) VALUES
-	(101, 2800, 'Análise e Desenvolvimento de Sistemas', 5, 'ADS'),
-	(102, 1400, 'Desenvolvimento de Software Multiplataforma', 5, 'DSM')
-
-	INSERT INTO professor (codigo, nome, titulacao) VALUES
-	(1001, 'Marcelo Silva', 'Mestre'),
-	(1002, 'Rafael Medeiros', 'Mestre'),
-	(1003, 'Adriana Bastos', 'Doutora'),
-	(1004, 'Henrique Galvão', 'Mestre'),
-	(1005, 'Ulisses Santos Barbosa', 'Doutor'),
-	(1006, 'Pedro Guimarães', 'Mestre'),
-	(1007, 'Reinaldo Santos', 'Doutor'),
-	(1008, 'Pedro Lima', 'Mestre'),
-	(1009, 'Marcelo Soares', 'Doutor'),
-	(1010, 'Costa Lima de Souza', 'Mestre'),
-	(1011, 'Gabriela Gonçalves', 'Doutora'),
-	(1012, 'Yasmin Ribeiro', 'Mestre')
-
-	INSERT INTO disciplina (codigo, nome, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, professor_codigo)VALUES 
-	(1001, 'Laboratório de Banco de Dados', 4, '14:50', '18:20', 'Segunda', 101, 1001),
-	(1002, 'Banco de Dados', 4, '14:50', '18:20', 'Terça', 101, 1001),
-	(1003, 'Algorítmos e Lógica de Programação', 4, '14:50', '18:20', 'Segunda', 101, 1001),
-	(1004, 'Matemática Discreta', 4, '13:00', '16:30','Quinta', 101, 1001),
-	(1005, 'Linguagem de Programação', 4, '14:50', '18:20', 'Terça', 101, 1001),
-	(1006, 'Estruturas de Dados', 2, '13:00', '14:40', 'Terça', 101, 1001),
-	(1007, 'Programação Mobile', 4, '13:00', '16:30', 'Sexta', 101, 1001),
-	(1008, 'Empreendedorismo', 2, '13:00', '14:40', 'Quarta', 101, 1002),
-	(1009, 'Ética e Responsabilidade', 2, '16:50', '18:20', 'Segunda', 101, 1002),
-	(1010, 'Administração Geral', 4, '14:50', '18:20', 'Terça', 101, 1002),
-	(1011, 'Sistemas de Informação', 4, '13:00', '16:30', 'Terça', 101, 1002),
-	(1012, 'Gestão e Governança de TI', 4, '14:50', '18:20', 'Sexta', 101, 1002),
-	(1013, 'Redes de Computadores', 4, '14:50', '18:20', 'Quinta', 101, 1004),
-	(1014, 'Contabilidade', 2, '13:00', '14:40', 'Quarta', 101, 1001),
-	(1015, 'Economia e Finanças', 4, '13:00', '16:30', 'Quarta', 101, 1004),
-	(1016, 'Arquitetura e Organização de Computadores', 4, '13:00', '16:30', 'Segunda', 101, 1001),
-	(1017, 'Laboratório de Hardware', 4, '13:00', '16:30', 'Segunda', 101, 1001),
-	(1018, 'Sistemas Operacionais', 4, '14:50', '18:20', 'Quinta', 101, 1001),
-	(1019, 'Sistemas Operacionais 2', 4, '14:50', '18:20', 'Sexta', 101, 1001),
-	(1020, 'Programação Web', 4, '13:00', '16:30', 'Terça', 101, 1001),
-	(1021, 'Programação em Microinformática', 2, '13:00', '14:40', 'Sexta', 101, 1004),
-	(1022, 'Programação Linear', 2, '13:00', '14:40', 'Segunda', 101, 1004),
-	(1023, 'Cálculo', 4, '13:00', '16:30', 'Segunda', 101, 1003),
-	(1024, 'Teste de Software', 2, '13:00', '14:40', 'Quinta', 101, 1002),
-	(1025, 'Engenharia de Software 1', 4, '13:00', '16:30', 'Segunda', 101, 1001),
-	(1026, 'Engenharia de Software 2', 4, '13:00', '16:30', 'Terça', 101, 1002),
-	(1027, 'Engenharia de Software 3', 4, '14:50', '18:20', 'Segunda', 101, 1005),
-	(1028, 'Laboratório de Engenharia de Software', 4, '14:50', '18:20', 'Quarta', 101, 1004),
-	(1029, 'Inglês 1', 4, '14:50', '18:20', 'Sexta', 101, 1005),
-	(1030, 'Inglês 2', 2, '14:50', '16:30', 'Terça', 101, 1005),
-	(1031, 'Inglês 3', 2, '13:00', '14:40', 'Sexta', 101, 1005),
-	(1032, 'Inglês 4', 2, '13:00', '14:40', 'Segunda', 101, 1005),
-	(1033, 'Inglês 5', 2, '13:00', '14:40', 'Terça', 101, 1005),
-	(1034, 'Inglês 6', 2, '13:00', '14:40', 'Quinta', 101, 1005),
-	(1035, 'Sociedade e Tecnologia', 2, '14:50', '16:30', 'Terça', 101, 1002),
-	(1036, 'Interação Humano Computador', 4, '14:50', '18:20', 'Terça', 101, 1002),
-	(1037, 'Estatística Aplicada', 4, '14:50', '18:20', 'Quarta', 101, 1004),
-	(1038, 'Laboratório de Redes de Computadores', 4, '14:50', '18:20', 'Sexta', 101, 1004),
-	(1039, 'Inteligência Artificial', 4, '13:00', '16:30', 'Quarta', 101, 1004),
-	(1040, 'Programação para Mainframes', 4, '14:50', '18:20', 'Quarta', 101, 1004)
-
-	INSERT INTO disciplina (codigo, nome, qtd_aulas, horario_inicio, horario_fim, dia, curso_codigo, professor_codigo)VALUES 
-	(1041, 'Desenvolvimento de Aplicações Distribuídas', 4, '13:00', '16:30', 'Segunda', 102, 1006),
-	(1042, 'Segurança de Aplicações Web', 4, '13:00', '16:30', 'Segunda', 102, 1006),
-	(1043, 'Banco de Dados NoSQL', 4, '13:00', '16:30', 'Terça', 102, 1006),
-	(1044, 'Gerenciamento de Projetos de Software Ágil', 4, '13:00', '16:30', 'Terça', 102, 1007),
-	(1045, 'Desenvolvimento de Aplicações Móveis', 4, '13:00', '16:30', 'Quarta', 102, 1012),
-	(1046, 'Desenvolvimento de APIs', 2, '13:00', '14:40', 'Quarta', 102, 1011),
-	(1047, 'Modelagem de Dados', 4, '13:00', '16:30', 'Quinta', 102, 1011),
-	(1048, 'Arquitetura de Software Distribuído', 4, '13:00', '16:30', 'Quinta', 102, 1011),
-	(1049, 'Engenharia de Requisitos Avançada', 4, '13:00', '16:30', 'Sexta', 102, 1010),
-	(1050, 'Metodologias Ágeis', 2, '13:00', '14:40', 'Sexta', 102, 1010),
-	(1051, 'Desenvolvimento de Interfaces Gráficas', 4, '14:50', '18:20', 'Segunda', 102, 1010),
-	(1052, 'Auditoria de Sistemas', 4, '14:50', '18:20', 'Segunda', 102, 1010),
-	(1053, 'Administração de Bancos de Dados', 4, '14:50', '18:20', 'Terça', 102, 1009),
-	(1054, 'Gestão de Projetos de TI', 4, '14:50', '18:20', 'Terça', 102, 1009),
-	(1055, 'Desenvolvimento de Jogos Digitais', 4, '14:50', '18:20', 'Quarta', 102, 1009),
-	(1056, 'Segurança de Redes', 2, '14:50', '16:30', 'Quarta', 102, 1008),
-	(1057, 'Mineração de Dados', 4, '14:50', '18:20', 'Quinta', 102, 1008),
-	(1058, 'Arquitetura de Software Orientada a Serviços', 4, '14:50', '18:20', 'Quinta', 102, 1006),
-	(1059, 'Análise de Negócios em TI', 4, '14:50', '18:20', 'Sexta', 102, 1007),
-	(1060, 'DevOps', 2, '14:50', '16:30', 'Sexta', 102, 1007),
-	(1061, 'Desenvolvimento de Sistemas Embarcados', 2, '16:40', '18:20', 'Segunda', 102, 1007),
-	(1062, 'Criptografia e Segurança de Dados', 2, '16:40', '18:20', 'Segunda', 102, 1007),
-	(1063, 'Big Data Analytics', 2, '16:40', '18:20', 'Terça', 102, 1007),
-	(1064, 'Gerenciamento Ágil de Projetos', 2, '16:40', '18:20', 'Terça', 102, 1008),
-	(1065, 'Desenvolvimento de Aplicações Desktop', 2, '16:40', '18:20', 'Quarta', 102, 1008),
-	(1066, 'Segurança em IoT', 2, '16:40', '18:20', 'Quarta', 102, 1008),
-	(1067, 'Banco de Dados Geoespaciais', 2, '16:40', '18:20', 'Quinta', 102, 1008),
-	(1068, 'Arquitetura de Microserviços', 2, '16:40', '18:20', 'Quinta', 102, 1009),
-	(1069, 'Engenharia de Requisitos Elicitação e Análise', 2, '16:40', '18:20', 'Sexta', 102, 1009),
-	(1070, 'Scrum e Métodos Ágeis', 2, '16:40', '18:20', 'Sexta', 102, 1009),
-	(1071, 'Desenvolvimento de Aplicações Híbridas', 4, '13:00', '16:30', 'Segunda', 102, 1007),
-	(1072, 'Análise de Riscos em Segurança da Informação', 4, '13:00', '16:30', 'Segunda', 102, 1007),
-	(1073, 'Banco de Dados Distribuídos', 4, '13:00', '16:30', 'Terça', 102, 1008),
-	(1074, 'Gestão de Projetos de Desenvolvimento de Software', 4, '13:00', '16:30', 'Terça', 102, 1009),
-	(1075, 'Desenvolvimento de Aplicações para Dispositivos Móveis', 4, '13:00', '16:30', 'Quarta', 102, 1009),
-	(1076, 'Segurança da Informação em Cloud Computing', 2, '13:00', '14:40', 'Quarta', 102, 1010),
-	(1077, 'Data Science Aplicado', 4, '13:00', '16:30', 'Quinta', 102, 1011),
-	(1078, 'Arquitetura de Microsserviços Distribuídos', 4, '13:00', '16:30', 'Quinta', 102, 1012),
-	(1079, 'Engenharia de Requisitos para Sistemas Distribuídos', 4, '13:00', '16:30', 'Sexta', 102, 1012),
-	(1080, 'Kanban e Lean para Desenvolvimento de Software', 2, '13:00', '14:40', 'Sexta', 102, 1012)
+	INSERT INTO @tabela (aluno_nome, aluno_ra, disciplina_codigo, matricula_codigo)
+	SELECT DISTINCT a.nome AS nome, a.ra AS ra, d.codigo AS disciplina_codigo, m.aluno_ra AS aluno_ra
+	FROM aluno a, matricula m, matricula_disciplina md, disciplina d
+	WHERE m.aluno_ra = a.ra
+	AND md.matricula_codigo = m.codigo
+	AND md.disciplina_codigo = d.codigo
+	AND md.situacao = 'Em curso'
+	RETURN
 END
-use master
-DROP DATABASE springagis
+GO
+CREATE PROCEDURE sp_verificaraula(@codigodisciplina INT, @dataaula DATE, @saida BIT OUTPUT)
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM aula WHERE disciplina_codigo = @codigodisciplina AND @dataaula = data_aula)
+	BEGIN
+		SET @saida = 1
+	END
+	ELSE
+	BEGIN
+		SET @saida = 0
+	END
+END
+GO
+CREATE TRIGGER t_geraravaliacoes ON avaliacao
+AFTER INSERT, DELETE
+AS
+BEGIN
+	DECLARE @matriculacodigo INT,
+			@disciplinacodigo INT,
+			@avaliacaodisciplina INT,
+			@avaliacaocodigo INT
+	DECLARE cur CURSOR FOR
+	SELECT md.matricula_codigo, md.disciplina_codigo
+	FROM matricula_disciplina md
+	WHERE md.situacao = 'Em curso'
 
-drop table nota_avaliacao
-drop table avaliacao
+	IF NOT EXISTS(SELECT * FROM DELETED)
+	BEGIN
+		SELECT @avaliacaodisciplina = disciplina_codigo, @avaliacaocodigo = avaliacao_codigo FROM inserted
+
+		OPEN cur
+		FETCH NEXT FROM cur INTO @matriculacodigo, @disciplinacodigo
+		WHILE @@FETCH_STATUS = 0
+		BEGIN
+			IF(@disciplinacodigo = @avaliacaodisciplina)
+			BEGIN
+				INSERT INTO nota_avaliacao VALUES
+				(0, @avaliacaocodigo, @disciplinacodigo, @matriculacodigo)
+			END
+		FETCH NEXT FROM cur INTO @matriculacodigo, @disciplinacodigo
+		END
+	END
+	ELSE
+	BEGIN
+		SELECT @avaliacaodisciplina = disciplina_codigo, @avaliacaocodigo = avaliacao_codigo FROM deleted
+		OPEN cur
+		FETCH NEXT FROM cur INTO @matriculacodigo, @disciplinacodigo
+		WHILE @@FETCH_STATUS = 0
+		BEGIN
+		IF(@disciplinacodigo = @avaliacaodisciplina)
+			BEGIN
+				DELETE nota_avaliacao
+				WHERE avaliacao_codigo = @avaliacaocodigo
+				AND	disciplina_codigo = @disciplinacodigo
+				AND matricula_codigo = @matriculacodigo
+			END
+			FETCH NEXT FROM cur INTO @matriculacodigo, @disciplinacodigo
+		END
+	END
+	CLOSE CUR
+	DEALLOCATE CUR
+END
+GO
+CREATE TRIGGER t_atualizarmedia ON nota_avaliacao
+AFTER INSERT, UPDATE
+AS
+BEGIN
+			DECLARE @nota CHAR(3),
+				@matriculacodigo INT,
+				@disciplinacodigo INT,
+				@avaliacaocodigo INT,
+				@peso FLOAT,
+				@media CHAR(3)
+		SELECT @nota = nota, @matriculacodigo = matricula_codigo, @disciplinacodigo = disciplina_codigo, @avaliacaocodigo = avaliacao_codigo FROM inserted
+
+		SELECT @media = CAST(ROUND(SUM(na.nota * a.peso), 2) AS CHAR)
+		FROM nota_avaliacao na, avaliacao a
+		WHERE na.avaliacao_codigo = a.avaliacao_codigo
+			AND na.matricula_codigo = @matriculacodigo
+			AND na.disciplina_codigo = @disciplinacodigo
+
+		UPDATE matricula_disciplina
+		SET nota_final = @media
+		WHERE disciplina_codigo = @disciplinacodigo
+			AND matricula_codigo = @matriculacodigo
+END

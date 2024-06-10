@@ -14,8 +14,10 @@
 			<li class="menu-item"><a href="indexsecretaria">Home</a></li>
 			<li class="menu-item"><a href="aluno">Aluno</a></li>
 			<li class="menu-item"><a href="historico">Histórico Aluno</a></li>
-			<li class="menu-item"><a href="secretariadispensa">Resolver Dispensas de Disciplina</a></li>
+			<li class="menu-item"><a href="secretariadispensa">Resolver Dispensas</a></li>
 			<li class="menu-item"><a href="matricula">Matricula</a></li>
+			<li class="menu-item"><a href="statusfalta">Faltas Alunos</a></li>
+			<li class="menu-item"><a href="relatorionota">Notas Alunos</a></li>
 			<li class="menu-item right"><a href="index">Sair</a></li>
 		</ul>
 	</nav>

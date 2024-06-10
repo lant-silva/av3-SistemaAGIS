@@ -8,13 +8,13 @@
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
 <title>AGIS - Aula</title>
 <header>
-	<h1 align="center">Gerenciamento de Aulas</h1>
 	<div>
 		<jsp:include page="menuprofessor.jsp" />
 	</div>
 </header>
 </head>
 <body>
+	<h1 class="gerenciamento-matricula">Gerenciamento de Aulas</h1>
 	<div align="center" class="container">
 		<form action="aula" method="post">
 			<table>
@@ -56,6 +56,7 @@
 					</c:if>
 				</div>
 			</table>
+			</form>
 			</br>
 			<div>
 				<H2><b>Aula - </b><c:out value="${disciplina.nome }"></c:out></H2>
@@ -101,7 +102,6 @@
 					</table>
 				</c:if>
 			</div>
-		</form>
 	</div>
 </body>
 </html>

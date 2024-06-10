@@ -85,11 +85,12 @@ public class AlunoController {
 		try {
 			cursos = listarCursos();
 			if(!cmd.contains("Listar")) {
-				cr = buscarCurso(curso);
-				a.setCurso(cr);
-				a.setCpf(cpf);
+				a.setRa(ra);
 			}
 			if(cmd.contains("Cadastrar") || cmd.contains("Alterar")) {
+				cr = buscarCurso(curso);
+				a.setCurso(cr);
+				
 				a.setCpf(cpf);
 				a.setRa(gerarRa());
 				a.setNome(nome);

@@ -14,6 +14,6 @@
             <jsp:include page="menualuno.jsp" />
         </div>
     </header>
-    <h1 class="portal-aluno">Portal Aluno</h1>
+    <h1 class="gerenciamento-matricula">Portal do Aluno</h1>
 </body>
 </html>

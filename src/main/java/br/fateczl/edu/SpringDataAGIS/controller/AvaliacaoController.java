@@ -46,7 +46,7 @@ public class AvaliacaoController {
 	public ModelAndView avaliacaoPost(@RequestParam Map<String, String> allRequestParam, ModelMap model) {
 		String cmd = allRequestParam.get("botao");
 		String disciplina = allRequestParam.get("disciplina");
-		String codigoAvaliacao = allRequestParam.get("codigo");
+		String codigoAvaliacao = allRequestParam.get("avaliacao_codigo");
 		String nome = allRequestParam.get("nome");
 		String peso = allRequestParam.get("peso");
 		

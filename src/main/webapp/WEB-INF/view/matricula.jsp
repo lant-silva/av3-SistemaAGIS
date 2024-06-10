@@ -8,7 +8,6 @@
 <link rel="stylesheet" type="text/css" href='<c:url value = "./resources/css/styles.css"/>'>
 <title>AGIS - Matricula</title>
 <header>
-	
 	<div>
 		<jsp:include page="menualuno.jsp" />
 	</div>
@@ -92,6 +91,7 @@
 			</c:if>
 			
 			<c:if test="${not empty disciplinas and listar eq 'true'}">
+			<div class="container">
 				<table id="listaDisciplinas" class="table_round" align="center">
 					<thead>
 						<tr> 
@@ -119,6 +119,7 @@
 						</br>
 					</tbody>
 				</table>
+				</div>
 			</c:if>
 		</div>
 	</form>

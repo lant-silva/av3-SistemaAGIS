@@ -23,7 +23,7 @@ import lombok.Setter;
 @Table(name = "avaliacao")
 public class Avaliacao {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "avaliacao_codigo", nullable = false)
 	private int avaliacao_codigo;
 
 	@JoinColumn(name = "disciplina_codigo", nullable = false)

@@ -39,6 +39,15 @@ import lombok.ToString;
 				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
 		}
 )
+@NamedStoredProcedureQuery(
+		name = "Aula.sp_verificaraula",
+		procedureName = "sp_verificaraula",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "disciplinaCodigo", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "dataAula", type = LocalDate.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = Boolean.class)
+		}
+)
 public class Aula {
 	
 	@Id

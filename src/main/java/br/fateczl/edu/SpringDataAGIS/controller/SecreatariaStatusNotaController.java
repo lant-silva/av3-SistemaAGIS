@@ -36,7 +36,7 @@ import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.util.JRLoader;
 
 @Controller
-public class StatusFaltaController {
+public class SecreatariaStatusNotaController {
 	
 	@Autowired
 	private IMatriculaDisciplinaRepository mdRep;
@@ -47,8 +47,8 @@ public class StatusFaltaController {
 	@Autowired
 	DataSource ds;
 
-	@RequestMapping(name="statusfalta", value="/statusfalta", method = RequestMethod.GET)
-	public ModelAndView statusFaltaGet(@RequestParam Map<String, String> allRequestParam, ModelMap model) {
+	@RequestMapping(name="relatorionota", value="/relatorionota", method = RequestMethod.GET)
+	public ModelAndView secretariaStatusNotaGet(@RequestParam Map<String, String> allRequestParam, ModelMap model) {
 		String erro = "";
 		List<Disciplina> disciplinas = new ArrayList<>();
 		try {
@@ -59,16 +59,11 @@ public class StatusFaltaController {
 			model.addAttribute("erro", erro);
 			model.addAttribute("disciplinas", disciplinas);
 		}
-		
-		return new ModelAndView("statusfalta");
+		return new ModelAndView("relatorionota");
 	}
 	
-	private List<Disciplina> listarDisciplinas() {
-		return dRep.findAll();
-	}
-
-	@RequestMapping(name="statusfalta", value="/statusfalta", method = RequestMethod.POST)
-	public ModelAndView statusFaltaPost(@RequestParam Map<String, String> allRequestParam, ModelMap model) {
+	@RequestMapping(name="relatorionota", value="/relatorionota", method = RequestMethod.POST)
+	public ModelAndView secretariaStatusNotaPost(@RequestParam Map<String, String> allRequestParam, ModelMap model) {
 		String cmd = allRequestParam.get("botao");
 		String disciplina = allRequestParam.get("disciplina");
 		
@@ -90,12 +85,16 @@ public class StatusFaltaController {
 			model.addAttribute("alunos", alunos);
 			model.addAttribute("disciplinas", disciplinas);
 		}
-		return new ModelAndView("statusfalta");
+		return new ModelAndView("relatorionota");
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(name="relatoriofalta", value="/relatoriofalta", method = RequestMethod.POST)
-	public ResponseEntity relatorioPost(@RequestParam Map<String, String> allRequestParam) {
+	private List<Disciplina> listarDisciplinas() {
+		return dRep.findAll();
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(name="relatorionotas", value="/relatorionotas", method = RequestMethod.POST)
+	public ResponseEntity secreatariaRelatorioNotaPost(@RequestParam Map<String, String> allRequestParam) {
 		String erro = "";
 		Map<String, Object> paramRelatorio = new HashMap<String, Object>();
 		paramRelatorio.put("disciplina_codigo", allRequestParam.get("disciplina"));
@@ -107,7 +106,7 @@ public class StatusFaltaController {
 		
 		try {
 			Connection c = DataSourceUtils.getConnection(ds);
-			File arquivo = ResourceUtils.getFile("classpath:reports/relatoriofalta.jasper");
+			File arquivo = ResourceUtils.getFile("classpath:reports/relatorionota.jasper");
 			JasperReport report = (JasperReport) JRLoader.loadObjectFromFile(arquivo.getAbsolutePath());
 			bytes = JasperRunManager.runReportToPdf(report, paramRelatorio, c);
 		} catch(FileNotFoundException | JRException e) {
@@ -124,7 +123,7 @@ public class StatusFaltaController {
 		}
 		return new ResponseEntity(resource, header, status);
 	}
-
+	
 	private List<MatriculaDisciplina> buscarAlunos(String disciplina) throws Exception {
 		if(mdRep.listarAlunos(Integer.parseInt(disciplina)).isEmpty()) {
 			throw new Exception("Não há alunos cadastrados nessa disciplina");
@@ -132,4 +131,5 @@ public class StatusFaltaController {
 			return mdRep.listarAlunos(Integer.parseInt(disciplina));			
 		}
 	}
+	
 }
