@@ -70,6 +70,7 @@ public class RealizarAvaliacaoController {
     					nota = parametros.get(key);
     				}
     			}
+    			
     			saida = salvarNotas(codigos, nota, avaliacao, disciplina);
     		}
     	} catch(Exception e) {
@@ -81,12 +82,16 @@ public class RealizarAvaliacaoController {
 		return new ModelAndView("realizaravaliacao");
 	}
 
-	private String salvarNotas(String[] codigos, String[] nota, int avaliacao, int disciplina) {
+	private String salvarNotas(String[] codigos, String[] nota, int avaliacao, int disciplina) throws Exception {
 		int tam = codigos.length;
 		String saida = "";
 		for(int i=0;i<tam;i++) {
-			saida = naRep.sp_salvarnota(avaliacao, disciplina, Integer.parseInt(codigos[i]), Float.parseFloat(nota[i]));
+			if(Float.parseFloat(nota[i]) > 10 || Float.parseFloat(nota[i]) < 0) {
+				throw new Exception("Nota inválida para a matricula " + codigos[i]);
+			}else {				
+				saida = naRep.sp_salvarnota(avaliacao, disciplina, Integer.parseInt(codigos[i]), Float.parseFloat(nota[i]));
+			}
 		}
-		return saida;
+		return "Avaliação salva";
 	}	
 }
