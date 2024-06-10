@@ -65,7 +65,7 @@
 								</c:if>
 							</c:forEach>
 					</select></td>
-					<td><input type="submit" id="botao" name="botao" value="Gerar Relatório :D"></td>
+					<td><input type="submit" id="botao" name="botao" value="Gerar Relatório"></td>
 				</tr>
 			</table>
 		</form>
